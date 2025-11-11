@@ -1512,6 +1512,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Curve_Importer (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 451629497380278083, guid: 2ac7941afd544b34c90784be0438a5e2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5905312681047474565, guid: 2ac7941afd544b34c90784be0438a5e2, type: 3}
       propertyPath: m_Radius
       value: 1
@@ -2030,7 +2034,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 451629497380278083, guid: 2ac7941afd544b34c90784be0438a5e2, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5905312681047474565, guid: 2ac7941afd544b34c90784be0438a5e2, type: 3}
       propertyPath: m_Radius
