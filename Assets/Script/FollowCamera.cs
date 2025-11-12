@@ -1,34 +1,36 @@
-// FollowCamera.cs � smooth dynamic follow for PlayerMove
-// Drop this on your Main Camera and assign the Player (transform).
-//
-// Features:
-// - Smooth follow using spring-damping, not parenting (physics-friendly).
-// - Auto-looks toward the player's forward direction or velocity.
-// - Adjustable offsets and rotation lag for cinematic feel.
-
 using UnityEngine;
 
 public class FollowCamera : MonoBehaviour
 {
     [Header("Target")]
-    public Transform target;              // Assign Player object here.
+    public Transform target;
 
     [Header("Offsets")]
-    public Vector3 followOffset = new Vector3(0f, 3f, -8f); // relative to player
-    public Vector3 lookOffset = new Vector3(0f, 1.5f, 0f); // where the camera looks
+    public Vector3 followOffset = new Vector3(0f, 3f, -8f);
+    public Vector3 lookOffset = new Vector3(0f, 1.5f, 0f);
 
     [Header("Smoothing")]
-    [Tooltip("Higher = snappier follow, Lower = smoother delay")]
     public float positionSmoothTime = 0.15f;
     public float rotationSmoothSpeed = 6f;
 
-    [Header("Optional velocity-based look")]
-    public bool useVelocityLook = true;  // when true, look in the direction player moves
-    public float velocityInfluence = 0.3f; // 0 = ignore velocity, 1 = full influence
+    [Header("Velocity look")]
+    public bool useVelocityLook = true;
+    public float velocityInfluence = 0.3f;
 
-    private Vector3 velocitySmoothed;     // for SmoothDamp
+    [Header("Startup / Stall guards")]
+    [Tooltip("Snap (no smoothing) for at least this many seconds after Play.")]
+    public float startupSnapSeconds = 0.75f;
+    [Tooltip("Also keep snapping until the target is this 'stable' (m/s) for N frames.")]
+    public float stableSpeedThreshold = 0.05f;
+    public int stableFramesNeeded = 3;
+    [Tooltip("If a frame stalls longer than this unscaled time, snap this frame.")]
+    public float stallSnapThreshold = 0.25f;
 
-    Rigidbody playerRb;                   // cached RB to read velocity
+    Vector3 velocitySmoothed;
+    Rigidbody rb;
+    float startUnscaled;
+    int stableFrames;
+    Vector3 lastTargetPos;
 
     void Start()
     {
@@ -39,39 +41,56 @@ public class FollowCamera : MonoBehaviour
             return;
         }
 
-        playerRb = target.GetComponent<Rigidbody>();
-        // Immediately jump to correct position at start
-        transform.position = target.position + target.TransformDirection(followOffset);
-        transform.LookAt(target.position + lookOffset);
+        rb = target.GetComponent<Rigidbody>();
+        startUnscaled = Time.unscaledTime;
+        lastTargetPos = target.position;
+
+        // Hard snap on start
+        Vector3 desired = target.TransformPoint(followOffset);
+        transform.position = desired;
+        transform.rotation = Quaternion.LookRotation(target.forward, Vector3.up);
     }
 
     void LateUpdate()
     {
         if (!target) return;
 
-        // Base desired camera position in world space
+        // Detect stalls & startup window
+        bool inStartupWindow = (Time.unscaledTime - startUnscaled) < startupSnapSeconds;
+        bool frameStalled = Time.unscaledDeltaTime > stallSnapThreshold;
+
+        // Detect if target is still "settling" (teleporting / snapping)
+        float targetSpeed = (target.position - lastTargetPos).magnitude / Mathf.Max(Time.deltaTime, 1e-5f);
+        lastTargetPos = target.position;
+        if (targetSpeed < stableSpeedThreshold) stableFrames++; else stableFrames = 0;
+        bool targetStable = stableFrames >= stableFramesNeeded;
+
+        // Desired pose
         Vector3 desiredPos = target.TransformPoint(followOffset);
 
-        // Smoothly move to that position
-        transform.position = Vector3.SmoothDamp(transform.position, desiredPos, ref velocitySmoothed, positionSmoothTime);
-
-        // Compute direction to look
+        // Choose look direction
         Vector3 lookDir;
-        if (useVelocityLook && playerRb && playerRb.linearVelocity.sqrMagnitude > 0.1f)
+        if (useVelocityLook && rb && rb.linearVelocity.sqrMagnitude > 0.1f)
         {
-            // Blend between player's forward and its velocity direction
-            Vector3 velDir = playerRb.linearVelocity.normalized;
+            Vector3 velDir = rb.linearVelocity.normalized;
             lookDir = Vector3.Lerp(target.forward, velDir, velocityInfluence);
         }
         else
         {
             lookDir = target.forward;
         }
-
-        Vector3 lookTarget = target.position + lookOffset;
         Quaternion desiredRot = Quaternion.LookRotation(lookDir, Vector3.up);
 
-        // Smoothly rotate toward desired rotation
+        // SNAP while: startup window OR frame stall OR target not yet stable
+        if (inStartupWindow || frameStalled || !targetStable)
+        {
+            transform.position = desiredPos;
+            transform.rotation = desiredRot;
+            return;
+        }
+
+        // Smooth after things are stable
+        transform.position = Vector3.SmoothDamp(transform.position, desiredPos, ref velocitySmoothed, positionSmoothTime);
         transform.rotation = Quaternion.Slerp(transform.rotation, desiredRot, rotationSmoothSpeed * Time.deltaTime);
     }
 }
