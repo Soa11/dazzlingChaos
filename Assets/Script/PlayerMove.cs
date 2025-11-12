@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Splines;
+using Unity.Mathematics; // Required for float3
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerMove : MonoBehaviour
@@ -26,15 +27,13 @@ public class PlayerMove : MonoBehaviour
     public float snapDistance = 1.5f;
 
     [Header("Player Offset")]
-    public Vector3 playerOffset = Vector3.zero; // Offset to prevent player from getting stuck in splines
+    public Vector3 playerOffset = Vector3.zero;
 
     private Rigidbody rb;
-    public int CurrentRailIndex { get; private set; } = 0; // Exposed as a public property
-    public float NormalizedT { get; private set; } = 0f; // Exposed as a public property
+    public int CurrentRailIndex { get; private set; } = 0;
+    public float NormalizedT { get; private set; } = 0f;
     private float speed = 0f;
-    private bool isOnRail = true;
-
-    public bool IsOnRail => isOnRail; // Public property for camera script
+    public bool IsOnRail { get; private set; } = true;
 
     void Awake()
     {
@@ -51,7 +50,7 @@ public class PlayerMove : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (isOnRail)
+        if (IsOnRail)
         {
             MoveAlongRail();
         }
@@ -96,14 +95,17 @@ public class PlayerMove : MonoBehaviour
     {
         rb.useGravity = true;
 
+        // Ensure the Rigidbody is not kinematic and has gravity enabled
+        rb.isKinematic = false;
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange); // Use AddForce instead of velocity
+            rb.linearVelocity += Vector3.up * jumpForce;
         }
 
         if (TrySnapToNearestRail())
         {
-            isOnRail = true;
+            IsOnRail = true;
             rb.isKinematic = true;
             rb.useGravity = false;
         }
@@ -119,10 +121,15 @@ public class PlayerMove : MonoBehaviour
 
     void EnterAir(Vector3 tangent)
     {
-        isOnRail = false;
-        rb.isKinematic = false; // Ensure the Rigidbody is affected by physics
-        rb.useGravity = true;   // Enable gravity
-        rb.AddForce(tangent * speed, ForceMode.VelocityChange); // Use AddForce instead of velocity
+        Debug.Log("Player has entered the air state!"); // Debug message for testing
+        IsOnRail = false;
+
+        // Ensure Rigidbody settings are correct for falling
+        rb.isKinematic = false;
+        rb.useGravity = true;
+
+        // Apply initial velocity to simulate falling
+        rb.linearVelocity = tangent * speed;
     }
 
     bool TrySnapToNextRail(Vector3 currentPosition)
@@ -135,59 +142,39 @@ public class PlayerMove : MonoBehaviour
             var spline = nextRail.container.Splines[nextRail.splineIndex];
             var worldMatrix = nextRail.container.transform.localToWorldMatrix;
 
-            float startDistance = Vector3.Distance(currentPosition, nextRail.container.transform.TransformPoint(SplineUtility.EvaluatePosition(spline, 0f)));
-            float endDistance = Vector3.Distance(currentPosition, nextRail.container.transform.TransformPoint(SplineUtility.EvaluatePosition(spline, 1f)));
+            float3 nearestPoint;
+            float normalizedT;
+            float distance = SplineUtility.GetNearestPoint(spline, (float3)currentPosition, out nearestPoint, out normalizedT, resolution: 4, iterations: 2);
 
-            if (startDistance < snapDistance || endDistance < snapDistance)
+            if (distance <= snapDistance)
             {
                 CurrentRailIndex = i;
-                NormalizedT = startDistance < endDistance ? 0f : 1f;
+                NormalizedT = normalizedT;
                 return true;
             }
         }
+
         return false;
     }
 
     bool TrySnapToNearestRail()
     {
-        float closestDistance = snapDistance;
-        int closestRailIndex = -1;
-        float closestT = 0f;
-
         for (int i = 0; i < rails.Count; i++)
         {
             var rail = rails[i];
             var spline = rail.container.Splines[rail.splineIndex];
             var worldMatrix = rail.container.transform.localToWorldMatrix;
 
-            for (float tt = 0; tt <= 1f; tt += 0.05f)
+            float3 nearestPoint;
+            float normalizedT;
+            float distance = SplineUtility.GetNearestPoint(spline, (float3)transform.position, out nearestPoint, out normalizedT, resolution: 4, iterations: 2);
+
+            if (distance <= snapDistance)
             {
-                Vector3 position = rail.container.transform.TransformPoint(SplineUtility.EvaluatePosition(spline, tt));
-                float distance = Vector3.Distance(transform.position, position);
-
-                if (distance < closestDistance)
-                {
-                    closestDistance = distance;
-                    closestRailIndex = i;
-                    closestT = tt;
-                }
+                CurrentRailIndex = i;
+                NormalizedT = normalizedT;
+                return true;
             }
-        }
-
-        if (closestRailIndex >= 0)
-        {
-            CurrentRailIndex = closestRailIndex;
-            NormalizedT = closestT;
-            var rail = rails[CurrentRailIndex];
-            var spline = rail.container.Splines[rail.splineIndex];
-            var worldMatrix = rail.container.transform.localToWorldMatrix;
-
-            Vector3 position = rail.container.transform.TransformPoint(SplineUtility.EvaluatePosition(spline, NormalizedT)) + playerOffset;
-            Vector3 tangent = rail.container.transform.TransformDirection(SplineUtility.EvaluateTangent(spline, NormalizedT));
-
-            rb.MovePosition(position);
-            rb.MoveRotation(Quaternion.LookRotation(tangent, Vector3.up));
-            return true;
         }
 
         return false;
@@ -195,32 +182,31 @@ public class PlayerMove : MonoBehaviour
 
     void RespawnToStart()
     {
-        CurrentRailIndex = 0;
-        NormalizedT = 0f;
+        if (!ValidateRail(CurrentRailIndex)) return;
 
         var rail = rails[CurrentRailIndex];
         var spline = rail.container.Splines[rail.splineIndex];
         var worldMatrix = rail.container.transform.localToWorldMatrix;
 
-        Vector3 position = rail.container.transform.TransformPoint(SplineUtility.EvaluatePosition(spline, NormalizedT)) + playerOffset;
-        Vector3 tangent = rail.container.transform.TransformDirection(SplineUtility.EvaluateTangent(spline, NormalizedT));
+        float3 startPoint = SplineUtility.EvaluatePosition(spline, 0f);
+        Vector3 startPosition = rail.container.transform.TransformPoint((Vector3)startPoint) + playerOffset;
 
         rb.isKinematic = true;
         rb.useGravity = false;
-
-        rb.MovePosition(position);
-        rb.MoveRotation(Quaternion.LookRotation(tangent, Vector3.up));
+        transform.position = startPosition;
+        NormalizedT = 0f;
         speed = 0f;
-        isOnRail = true;
+        IsOnRail = true;
     }
 
     public bool ValidateRail(int railIndex)
     {
-        if (rails == null || railIndex < 0 || railIndex >= rails.Count) return false;
+        if (railIndex < 0 || railIndex >= rails.Count) return false;
 
         var rail = rails[railIndex];
-        if (rail.container == null || rail.container.Splines == null || rail.container.Splines.Count == 0) return false;
-
-        return true;
+        return rail.container != null &&
+               rail.container.Splines != null &&
+               rail.container.Splines.Count > rail.splineIndex &&
+               rail.splineIndex >= 0;
     }
 }

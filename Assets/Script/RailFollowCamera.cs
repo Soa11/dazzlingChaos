@@ -1,3 +1,6 @@
+// 12/11/2025 AI-Tag
+// This was created with the help of Assistant, a Unity Artificial Intelligence product.
+
 using UnityEngine;
 using UnityEngine.Splines;
 using Unity.Mathematics;
@@ -6,35 +9,38 @@ using Unity.Mathematics;
 public class RailFollowCamera : MonoBehaviour
 {
     [Header("Target")]
-    public RailRider rider;                   // assign your player’s RailRider
+    public PlayerMove player;                // Assign your player’s PlayerMove script
 
     [Header("Follow Behaviour")]
-    public float followDistance = 4f;         // meters behind along tangent
-    public float followHeight = 1.5f;       // meters above spline center
-    public float lookAhead = 2f;         // meters ahead for aim
-    public float positionLerp = 8f;
-    public float rotationLerp = 8f;
+    public float followDistance = 4f;       // Meters behind along tangent
+    public float followHeight = 1.5f;       // Meters above spline center
+    public float lookAhead = 2f;            // Meters ahead for aim
+    public float positionLerp = 8f;         // Lerp speed for position
+    public float rotationLerp = 8f;         // Lerp speed for rotation
 
     [Header("Offsets & Up")]
     public Vector3 worldOffset = Vector3.zero;
-    public bool useSplineUp = true;        // otherwise uses Vector3.up
+    public bool useSplineUp = true;         // Otherwise uses Vector3.up
 
     const float kEps = 1e-6f;
 
     void LateUpdate()
     {
-        if (!rider) return;
+        if (!player) return;
 
-        // Pull the current rail from the rider (public in your script)
-        var rail = rider.CurrentRail;
+        // Get the current rail and spline from the player
+        int currentRailIndex = player.CurrentRailIndex; // Correct property name
+        if (!player.ValidateRail(currentRailIndex)) return;
+
+        var rail = player.rails[currentRailIndex];
         var container = rail.container;
         if (!container || container.Splines == null || container.Splines.Count == 0) return;
 
         int sIdx = Mathf.Clamp(rail.splineIndex, 0, container.Splines.Count - 1);
         Spline s = container.Splines[sIdx];
 
-        // Current t from rider (public NormalizedT)
-        float t = rider.NormalizedT;
+        // Current t from player
+        float t = player.NormalizedT; // Correct property name
 
         // Evaluate pose at t (LOCAL -> WORLD)
         SplineUtility.Evaluate(s, t, out float3 pL, out float3 tL, out float3 uL);
@@ -42,7 +48,7 @@ public class RailFollowCamera : MonoBehaviour
         Vector3 tanW = container.transform.TransformDirection(math.normalizesafe(tL, new float3(0, 0, 1)));
         Vector3 upW = container.transform.TransformDirection(math.normalizesafe(uL, new float3(0, 1, 0)));
 
-        // Look-ahead sampling (no need to know rider.loop; just clamp)
+        // Look-ahead sampling (no need to know player.loop; just clamp)
         float length = Mathf.Max(0.001f, SplineUtility.CalculateLength(s, container.transform.localToWorldMatrix));
         float dn = Mathf.Clamp01(lookAhead / length);
         float tAhead = Mathf.Clamp01(t + dn);
@@ -58,7 +64,7 @@ public class RailFollowCamera : MonoBehaviour
         );
 
         Vector3 aimDir = (posAheadW - transform.position);
-        if (aimDir.sqrMagnitude < kEps) aimDir = tanW;     // guard zero vector
+        if (aimDir.sqrMagnitude < kEps) aimDir = tanW;     // Guard against zero vector
         Vector3 camUp = useSplineUp ? upW : Vector3.up;
 
         Quaternion targetRot = Quaternion.LookRotation(aimDir.normalized, camUp);
