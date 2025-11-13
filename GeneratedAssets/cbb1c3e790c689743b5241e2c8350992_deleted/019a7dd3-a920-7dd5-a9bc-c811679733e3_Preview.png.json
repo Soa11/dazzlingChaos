@@ -1,0 +1,11 @@
+{
+    "asset": "cbb1c3e790c689743b5241e2c8350992",
+    "fileName": "019a7dd3-a920-7dd5-a9bc-c811679733e3_Preview.png",
+    "prompt": "bubble like a material for the sphere player\n\nhalf transparent half opaque\nRefelctive of enviroment",
+    "negativePrompt": "",
+    "model": "44ec3749-963a-44b1-aa54-dc19f6ed8ab2",
+    "modelName": "Unity Texture2D",
+    "customSeed": 1624708181,
+    "w3CTraceId": "3994a13a48475fee41f9bcf3649f365f",
+    "refinementMode": "Generation"
+}

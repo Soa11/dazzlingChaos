@@ -1,0 +1,11 @@
+{
+    "asset": "cbb1c3e790c689743b5241e2c8350992",
+    "fileName": "019a7dd3-1411-7247-b912-4658cd9a8e04_Preview.png",
+    "prompt": "bubble\nhalf transparent half opaque\nRefelctive of enviroment",
+    "negativePrompt": "",
+    "model": "44ec3749-963a-44b1-aa54-dc19f6ed8ab2",
+    "modelName": "Unity Texture2D",
+    "customSeed": 28053829,
+    "w3CTraceId": "613a7931297d4a3b511e276b2cb90db3",
+    "refinementMode": "Generation"
+}
