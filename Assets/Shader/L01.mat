@@ -59,9 +59,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Alpha_Clip_Threshold: 0.1
+    - _Alpha_Clip_Threshold: 0.25
     - _Emission_Intensity: 1
-    - _Normal_Strength: 0.25
+    - _Normal_Strength: 0.05
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
