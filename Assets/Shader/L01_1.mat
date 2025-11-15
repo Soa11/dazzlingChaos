@@ -60,13 +60,13 @@ Material:
     m_Ints: []
     m_Floats:
     - _Alpha_Clip_Threshold: 0.15
-    - _Emission_Intensity: 1
+    - _Emission_Intensity: 0.4
     - _Normal_Strength: 0.1
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
-    - _Base_Colour: {r: 1, g: 0, b: 0, a: 1}
-    - _Emission_Colour: {r: 1.9999999, g: 0, b: 0, a: 1}
+    - _Base_Colour: {r: 0.22352941, g: 1, b: 0.28235295, a: 1}
+    - _Emission_Colour: {r: 0.2216981, g: 1, b: 0.2839622, a: 1}
     - _Height_Tiling: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
