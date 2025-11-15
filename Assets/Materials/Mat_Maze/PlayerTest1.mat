@@ -39,11 +39,11 @@ Material:
     m_Ints: []
     m_Floats:
     - Vector1_0395056422a44efd961aa8b82a7cac27: 1
-    - _InnerAlpha: 0.15
+    - _InnerAlpha: 0.5
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
-    - Color_790da34f77604fb1ac22a4f098e78ffd: {r: 0.5, g: 0, b: 0, a: 0}
+    - Color_790da34f77604fb1ac22a4f098e78ffd: {r: 0.8113208, g: 0, b: 0, a: 0}
     - Vector2_79ea622919b74b44b051313cb76a0698: {r: 1, g: 3, b: 0, a: 0}
     - _BaseColour: {r: 0.08317016, g: 0.08317016, b: 0.8396226, a: 1}
   m_BuildTextureStacks: []
