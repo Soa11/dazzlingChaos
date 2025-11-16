@@ -24366,7 +24366,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6c5894ba681441548a8a32c134f3efc9, type: 2}
+  - {fileID: 2100000, guid: 6d75ddf79c2d7594fa0cd58ca99a10f9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -483887,6 +483887,37 @@ MonoBehaviour:
       m_Data: []
   m_Knots:
     m_KnotsLink: []
+--- !u!1 &1421823031
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1421823032}
+  m_Layer: 7
+  m_Name: PlayerStartingPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1421823032
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1421823031}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -207.73999, y: 120.47, z: -78.9}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1476185798
 GameObject:
   m_ObjectHideFlags: 0
@@ -508128,21 +508159,17 @@ MonoBehaviour:
   m_Sides: 8
   m_SegmentsPerUnit: 1
   m_Capped: 1
-  m_Radius: 0.5
+  m_Radius: 0.8
   m_Range: {x: 0, y: 1}
   m_FlipNormals: 0
   m_Shape:
-    rid: 139583307628151025
+    rid: 139583350771810659
   references:
     version: 2
     RefIds:
-    - rid: 139583307628151025
-      type: {class: SplineShape, ns: UnityEngine.Splines.ExtrusionShapes, asm: Unity.Splines}
-      data:
-        m_Template: {fileID: 157026943}
-        m_SplineIndex: 0
-        m_SideCount: 8
-        m_Axis: 1
+    - rid: 139583350771810659
+      type: {class: Road, ns: UnityEngine.Splines.ExtrusionShapes, asm: Unity.Splines}
+      data: 
 --- !u!23 &1478057281
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -508168,7 +508195,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b7f1481404ac9824cac0b6ad9d0686ab, type: 2}
+  - {fileID: 2100000, guid: 6d75ddf79c2d7594fa0cd58ca99a10f9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -966552,22 +966579,18 @@ MonoBehaviour:
   m_UpdateColliders: 1
   m_Sides: 8
   m_SegmentsPerUnit: 1
-  m_Capped: 1
-  m_Radius: 0.5
+  m_Capped: 0
+  m_Radius: 0.8
   m_Range: {x: 0, y: 1}
   m_FlipNormals: 0
   m_Shape:
-    rid: 139583307628151024
+    rid: 139583350771810639
   references:
     version: 2
     RefIds:
-    - rid: 139583307628151024
-      type: {class: SplineShape, ns: UnityEngine.Splines.ExtrusionShapes, asm: Unity.Splines}
-      data:
-        m_Template: {fileID: 157026943}
-        m_SplineIndex: 0
-        m_SideCount: 8
-        m_Axis: 1
+    - rid: 139583350771810639
+      type: {class: Road, ns: UnityEngine.Splines.ExtrusionShapes, asm: Unity.Splines}
+      data: 
 --- !u!23 &1924510236
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -966593,7 +966616,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b7f1481404ac9824cac0b6ad9d0686ab, type: 2}
+  - {fileID: 2100000, guid: 47a7accd425ff6949b7aef52ed2d58e3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1112098,11 +1112121,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4329721560970642318}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -207.73999, y: 120.47, z: -78.9}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 160.4, y: 119.56, z: -34.51}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 7302452157488615635}
   - {fileID: 7089699495797377910}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1112397,12 +1112421,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7486198003573647398}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.98612386, z: 0, w: 0.16601156}
-  m_LocalPosition: {x: -206.93, y: 121.167, z: -76.226}
+  m_LocalRotation: {x: -0, y: -0.98612386, z: -0, w: 0.16601156}
+  m_LocalPosition: {x: 0.80999756, y: 0.6969986, z: 2.6740036}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 4015921999123115827}
   m_LocalEulerAnglesHint: {x: 0, y: -160.888, z: 0}
 --- !u!1 &7486198003573647398
 GameObject:
@@ -1112498,7 +1112522,7 @@ SceneRoots:
   m_Roots:
   - {fileID: 203844589}
   - {fileID: 1237879808}
-  - {fileID: 7302452157488615635}
+  - {fileID: 1421823032}
   - {fileID: 4015921999123115827}
   - {fileID: 3998162147994394473}
   - {fileID: 167076440}
