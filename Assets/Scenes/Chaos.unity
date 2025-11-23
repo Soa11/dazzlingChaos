@@ -171,7 +171,6 @@ MonoBehaviour:
   m_Script: {fileID: 708702920}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
-  SegmentNames: []
 --- !u!114 &5526029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -168582,8 +168581,6 @@ MonoBehaviour:
   m_Script: {fileID: 1397037306}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
-  SegmentNames:
-  - L03
 --- !u!114 &22861752
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -216946,7 +216943,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &34901782
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -216993,7 +216990,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c6e38eae3c8cc5c4dbc614ad4e3fe8b1, type: 2}
+  - {fileID: 2100000, guid: 25edf4234089ce845a657b1d2bcea236, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -217033,7 +217030,7 @@ Transform:
   m_GameObject: {fileID: 34901781}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.98870265, z: -0, w: -0.1498907}
-  m_LocalPosition: {x: -207.62, y: 121.13, z: -78.45}
+  m_LocalPosition: {x: -207.74, y: 121.13, z: -78.84}
   m_LocalScale: {x: 2.8694258, y: 1.6411725, z: 1.6411725}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -241617,8 +241614,8 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 1
-  m_Color: {r: 0.7264151, g: 0.7264151, b: 0.7264151, a: 1}
-  m_Intensity: 2
+  m_Color: {r: 0.2735849, g: 0.2735849, b: 0.2735849, a: 1}
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -266477,7 +266474,6 @@ MonoBehaviour:
   m_Script: {fileID: 708702920}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
-  SegmentNames: []
 --- !u!114 &363490011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -315076,8 +315072,6 @@ MonoBehaviour:
   m_Script: {fileID: 1575085767}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
-  SegmentNames:
-  - L02
 --- !u!114 &537593014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -363701,8 +363695,6 @@ MonoBehaviour:
   m_Script: {fileID: 1397037306}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
-  SegmentNames:
-  - L04
 --- !u!114 &625651441
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -461058,7 +461050,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &819554593
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -703604,8 +703596,6 @@ MonoBehaviour:
   m_Script: {fileID: 1397037306}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
-  SegmentNames:
-  - L05
 --- !u!114 &1347776731
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -947467,7 +947457,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c6e38eae3c8cc5c4dbc614ad4e3fe8b1, type: 2}
+  - {fileID: 2100000, guid: 25edf4234089ce845a657b1d2bcea236, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -972099,7 +972089,7 @@ MonoBehaviour:
     splineIndex: 0
   - container: {fileID: 1561274289}
     splineIndex: 0
-  maxSpeed: 5
+  maxSpeed: 20
   accel: 10
   inputDeadzone: 0.05
   jumpImpulse: 8
