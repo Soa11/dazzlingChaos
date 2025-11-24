@@ -68,6 +68,8 @@ Material:
     - _BlendModePreserveSpecular: 1
     - _CastShadows: 1
     - _Cull: 0
+    - _DepthMax: 60
+    - _DepthMin: 5
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _Emission_Intensity: 0.5
@@ -82,6 +84,7 @@ Material:
     - _ZTest: 4
     - _ZWrite: 1
     - _ZWriteControl: 0
+    - _minBrightness: 0.3
     m_Colors:
     - _Base_Colour: {r: 0.62352943, g: 0.23921569, b: 0.50980395, a: 1}
     - _Emission_Colour: {r: 1.2470589, g: 0.47843137, b: 1.0196079, a: 1}
