@@ -68,7 +68,7 @@ Material:
     - _BlendModePreserveSpecular: 1
     - _CastShadows: 1
     - _Cull: 0
-    - _DepthMax: 60
+    - _DepthMax: 80
     - _DepthMin: 5
     - _DstBlend: 0
     - _DstBlendAlpha: 0
@@ -87,7 +87,7 @@ Material:
     - _minBrightness: 0.3
     m_Colors:
     - _Base_Colour: {r: 0.05882353, g: 0, b: 0.49019608, a: 1}
-    - _Emission_Colour: {r: 0.2352941, g: 0, b: 1.9607842, a: 1}
+    - _Emission_Colour: {r: 0.11764705, g: 0, b: 0.9803921, a: 1}
     - _Height_Tiling: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

@@ -68,11 +68,11 @@ Material:
     - _BlendModePreserveSpecular: 1
     - _CastShadows: 1
     - _Cull: 0
-    - _DepthMax: 60
+    - _DepthMax: 80
     - _DepthMin: 5
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _Emission_Intensity: 0.5
+    - _Emission_Intensity: 0.3
     - _Normal_Strength: 0.5
     - _QueueControl: 0
     - _QueueOffset: 0
@@ -86,7 +86,7 @@ Material:
     - _ZWriteControl: 0
     - _minBrightness: 0.5
     m_Colors:
-    - _Base_Colour: {r: 1, g: 0.003921569, b: 0.18039216, a: 1}
+    - _Base_Colour: {r: 0.6415094, g: 0, b: 0, a: 1}
     - _Emission_Colour: {r: 2.670157, g: 0.007843136, b: 0.6430745, a: 1}
     - _Height_Tiling: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []

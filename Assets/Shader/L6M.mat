@@ -68,11 +68,11 @@ Material:
     - _BlendModePreserveSpecular: 1
     - _CastShadows: 1
     - _Cull: 0
-    - _DepthMax: 60
+    - _DepthMax: 80
     - _DepthMin: 5
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _Emission_Intensity: 0.5
+    - _Emission_Intensity: 0.3
     - _Normal_Strength: 0.5
     - _QueueControl: 0
     - _QueueOffset: 0

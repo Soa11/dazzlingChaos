@@ -40,7 +40,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Emmision_Mask:
-        m_Texture: {fileID: 2800000, guid: 4ff4dc376547b2d4896efe5594712e63, type: 3}
+        m_Texture: {fileID: 2800000, guid: ee22f9817ccb0914685d0f6f3925a205, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Height_Map:
@@ -68,7 +68,7 @@ Material:
     - _BlendModePreserveSpecular: 1
     - _CastShadows: 1
     - _Cull: 0
-    - _DepthMax: 60
+    - _DepthMax: 80
     - _DepthMin: 5
     - _DstBlend: 0
     - _DstBlendAlpha: 0
@@ -86,7 +86,7 @@ Material:
     - _ZWriteControl: 0
     - _minBrightness: 0.3
     m_Colors:
-    - _Base_Colour: {r: 0.21960784, g: 0.79607844, b: 0.8627451, a: 1}
+    - _Base_Colour: {r: 0.13358848, g: 0.33495432, b: 0.3584906, a: 1}
     - _Emission_Colour: {r: 0.21960784, g: 0.79607844, b: 0.8627451, a: 1}
     - _Height_Tiling: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
