@@ -84,6 +84,7 @@ Material:
     - _ZTest: 4
     - _ZWrite: 1
     - _ZWriteControl: 0
+    - _minAlpha: 0.2
     - _minBrightness: 1
     m_Colors:
     - _Base_Colour: {r: 0.6415094, g: 0, b: 0, a: 1}
