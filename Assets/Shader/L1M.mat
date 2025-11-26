@@ -73,6 +73,7 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _Emission_Intensity: 0.5
+    - _MinAlpha: 0.1
     - _Normal_Strength: 0.5
     - _QueueControl: 0
     - _QueueOffset: 0
@@ -84,7 +85,7 @@ Material:
     - _ZTest: 4
     - _ZWrite: 1
     - _ZWriteControl: 0
-    - _minAlpha: 0.2
+    - _minAlpha: 1
     - _minBrightness: 1
     m_Colors:
     - _Base_Colour: {r: 0, g: 0.4245283, b: 0.032161206, a: 1}
