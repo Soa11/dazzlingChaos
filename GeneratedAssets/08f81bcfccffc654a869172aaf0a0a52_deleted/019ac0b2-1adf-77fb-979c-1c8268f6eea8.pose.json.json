@@ -1,0 +1,11 @@
+{
+    "asset": "08f81bcfccffc654a869172aaf0a0a52",
+    "fileName": "019ac0b2-1adf-77fb-979c-1c8268f6eea8.pose.json",
+    "prompt": "Animate IntroCamera position staring CameraAnimStart and finish at CameraAnimFin",
+    "negativePrompt": "",
+    "model": "9e46c009-67d8-4254-a3a0-32e3168247ee",
+    "modelName": "Text to Motion",
+    "customSeed": 1145959669,
+    "w3CTraceId": "cbb8b55b6daf5c665ff97d55518f4e0b",
+    "isTrimmed": false
+}
