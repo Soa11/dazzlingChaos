@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 45b708e9041c988478050443fbd21f36
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 301977
+  packageName: "coherence \u2013 Multiplayer Networking"
+  packageVersion: 2.0.0
+  assetPath: Packages/io.coherence.sdk/Coherence.Toolkit/Debugging/InterpolationDebugContextItem.cs
+  uploadId: 820992

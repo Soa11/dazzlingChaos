@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 759848554285e534d99738deb7c360a6
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 301977
+  packageName: "coherence \u2013 Multiplayer Networking"
+  packageVersion: 2.0.0
+  assetPath: Packages/io.coherence.sdk/Coherence.Common.Tests/baked/Interop/Scene.cs
+  uploadId: 820992

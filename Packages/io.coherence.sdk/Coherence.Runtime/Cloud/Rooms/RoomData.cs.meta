@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: bb3c602c681244628e0a0dc1e7dfc266
+timeCreated: 1755151419
+AssetOrigin:
+  serializedVersion: 1
+  productId: 301977
+  packageName: "coherence \u2013 Multiplayer Networking"
+  packageVersion: 2.0.0
+  assetPath: Packages/io.coherence.sdk/Coherence.Runtime/Cloud/Rooms/RoomData.cs
+  uploadId: 820992

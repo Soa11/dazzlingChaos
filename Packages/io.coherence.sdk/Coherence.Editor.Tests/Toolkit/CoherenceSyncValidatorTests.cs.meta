@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 1634565753e14ce2a8a106cf6d9b0d74
+timeCreated: 1756473573
+AssetOrigin:
+  serializedVersion: 1
+  productId: 301977
+  packageName: "coherence \u2013 Multiplayer Networking"
+  packageVersion: 2.0.0
+  assetPath: Packages/io.coherence.sdk/Coherence.Editor.Tests/Toolkit/CoherenceSyncValidatorTests.cs
+  uploadId: 820992

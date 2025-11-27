@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 08be01cd7e1d444f9e8b1ee44364ee04
+timeCreated: 1754390716
+AssetOrigin:
+  serializedVersion: 1
+  productId: 301977
+  packageName: "coherence \u2013 Multiplayer Networking"
+  packageVersion: 2.0.0
+  assetPath: Packages/io.coherence.sdk/Coherence.Runtime.Tests/FakeRequestThrottle.cs
+  uploadId: 820992

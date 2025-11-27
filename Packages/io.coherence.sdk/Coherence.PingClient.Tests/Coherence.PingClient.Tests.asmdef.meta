@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 9e0ebdb559d3bad41aaf00c2142d8796
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 301977
+  packageName: "coherence \u2013 Multiplayer Networking"
+  packageVersion: 2.0.0
+  assetPath: Packages/io.coherence.sdk/Coherence.PingClient.Tests/Coherence.PingClient.Tests.asmdef
+  uploadId: 820992

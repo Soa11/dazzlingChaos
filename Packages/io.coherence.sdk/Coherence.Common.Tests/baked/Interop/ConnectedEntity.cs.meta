@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: dae3998f9c8a34f4d85a70cccc034d17
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 301977
+  packageName: "coherence \u2013 Multiplayer Networking"
+  packageVersion: 2.0.0
+  assetPath: Packages/io.coherence.sdk/Coherence.Common.Tests/baked/Interop/ConnectedEntity.cs
+  uploadId: 820992

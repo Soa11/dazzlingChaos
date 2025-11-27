@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 9fad51ca0db34281a871f0285555cf9a
+timeCreated: 1760433602
+AssetOrigin:
+  serializedVersion: 1
+  productId: 301977
+  packageName: "coherence \u2013 Multiplayer Networking"
+  packageVersion: 2.0.0
+  assetPath: Packages/io.coherence.sdk/Coherence.Runtime/Cloud/Regions/RegionsService.cs
+  uploadId: 820992

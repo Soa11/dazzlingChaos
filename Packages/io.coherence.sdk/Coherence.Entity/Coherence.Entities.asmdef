@@ -1,0 +1,18 @@
+{
+    "name": "Coherence.Entities",
+    "rootNamespace": "",
+    "references": [
+        "Coherence.SimulationFrame",
+        "Coherence.Log",
+        "Coherence.Common"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

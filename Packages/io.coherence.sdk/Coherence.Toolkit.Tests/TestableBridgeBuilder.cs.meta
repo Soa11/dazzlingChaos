@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 5be3bfea2dc348018c3fe87ccf8b3bc4
+timeCreated: 1750753376
+AssetOrigin:
+  serializedVersion: 1
+  productId: 301977
+  packageName: "coherence \u2013 Multiplayer Networking"
+  packageVersion: 2.0.0
+  assetPath: Packages/io.coherence.sdk/Coherence.Toolkit.Tests/TestableBridgeBuilder.cs
+  uploadId: 820992

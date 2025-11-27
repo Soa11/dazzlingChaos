@@ -1,0 +1,391 @@
+{{~ for component in components ~}}
+    {{~ if component.component_definition.bake_conditional != "" ~}}
+    #if {{ component.component_definition.bake_conditional }}
+    {{~ end ~}}
+        public struct {{ component.component_definition.name }} : ICoherenceComponentData
+        {
+            public void ResetFrame(AbsoluteSimulationFrame frame)
+            {
+    {{~ for member in component.component_definition.members ~}}
+                FieldsMask |= {{ component.component_definition.name }}.{{ member.variable_name }}Mask;
+                {{ member.variable_name }}SimulationFrame = frame;
+    {{~ end ~}}
+            }
+    
+    {{~ for member in component.component_definition.members ~}}
+            public static uint {{ member.variable_name }}Mask => 0b{{ member.bit_mask }};
+            public AbsoluteSimulationFrame {{ member.variable_name }}SimulationFrame;
+            public {{ if no_unity_refs && member.c_sharp_type_name == "Color" }}Vector4{{ else }}{{ member.c_sharp_type_name }}{{ end }} {{ member.variable_name }};
+    {{~ end ~}}
+    
+            public uint FieldsMask { get; set; }
+            public uint StoppedMask { get; set; }
+            public uint GetComponentType() => {{ component.component_definition.id }};
+            public int PriorityLevel() => {{ if component.component_definition.overrides["priority"] != null && component.component_definition.overrides["priority"] == "high" }}1000{{ else }}100{{ end }};
+            public const int order = {{ component.component_definition.overrides["order"] ?? 0 }};
+            public uint InitialFieldsMask() => 0b{{ component.component_definition.bit_masks }};
+            public bool HasFields() => {{ if component.component_definition.members.size > 0 }}true{{ else }}false{{ end }};
+            public bool HasRefFields() => {{ component.has_ref_fields }};
+    
+            {{~ if component.fields_with_sim_frames.size > 0 ~}}
+            private long[] simulationFrames;
+            {{~ end ~}}
+    
+            public long[] GetSimulationFrames() {
+            {{~ if component.fields_with_sim_frames.size == 0 ~}}
+                return null;
+            {{~ else ~}}
+                if (simulationFrames == null)
+                {
+                    simulationFrames = new long[{{component.fields_with_sim_frames.size}}];
+                }
+    
+                {{~ for $idx in (1..component.fields_with_sim_frames.size) ~}}
+                simulationFrames[{{ $idx-1 }}] = {{ component.fields_with_sim_frames[$idx-1].variable_name }}SimulationFrame;
+                {{~ end ~}}
+    
+                return simulationFrames;
+            {{~ end ~}}
+            }
+    
+            public int GetFieldCount() => {{ component.component_definition.members.size }};
+    
+    {{ if no_unity_refs ~}}
+        {{~ for member in component.component_definition.members ~}}
+            {{ if no_unity_refs && member.c_sharp_type_name == "Color" }}{{memberType = "Vector4"}}{{ else }}{{ memberType = member.c_sharp_type_name }}{{ end }}
+            public bool Set_{{ member.variable_name }} ({{memberType}} value, AbsoluteSimulationFrame simFrame)
+            {
+                this.{{ member.variable_name }} = value;
+                this.{{ member.variable_name }}SimulationFrame = simFrame;
+                FieldsMask |= {{ component.component_definition.name }}.{{ member.variable_name }}Mask;
+                return true;
+            }
+        {{~ end ~}}
+    {{~ end }}
+            
+            public HashSet<Entity> GetEntityRefs()
+            {
+    {{~ if component.has_ref_fields ~}}
+                return new HashSet<Entity>()
+                {
+        {{~ for member in component.component_definition.members ~}}
+                {{~ if member.c_sharp_type_name == "Entity" ~}}
+                    this.{{ member.variable_name }},
+            {{~ end ~}}
+        {{~ end ~}}
+                };
+    {{~ else ~}}
+                return default;
+    {{~ end ~}}
+            }
+    
+            public uint ReplaceReferences(Entity fromEntity, Entity toEntity)
+            {
+    {{~ if component.has_ref_fields ~}}
+                uint refsMask = 0;
+    
+        {{~ for member in component.component_definition.members ~}}
+                {{~ if member.c_sharp_type_name == "Entity" ~}}
+                if (this.{{ member.variable_name }} == fromEntity)
+                {
+                    this.{{ member.variable_name }} = toEntity;
+                    refsMask |= 1u << {{ for.index }};
+                }
+            {{~ end ~}}
+        {{~ end ~}}
+    
+                FieldsMask |= refsMask;
+    
+                return refsMask;
+    {{~ else ~}}
+                return 0;
+    {{~ end ~}}
+            }
+            
+            public IEntityMapper.Error MapToAbsolute(IEntityMapper mapper)
+            {
+    {{~ if component.has_ref_fields ~}}
+                Entity absoluteEntity;
+                IEntityMapper.Error err;
+        {{~ for member in component.component_definition.members ~}}
+            {{~ if member.c_sharp_type_name == "Entity" ~}}
+                err = mapper.MapToAbsoluteEntity(this.{{ member.variable_name }}, false, out absoluteEntity);
+    
+                if (err != IEntityMapper.Error.None)
+                {
+                    return err;
+                }
+    
+                this.{{ member.variable_name }} = absoluteEntity;
+            {{~ end ~}}
+        {{~ end ~}}
+    {{~ end ~}}
+                return IEntityMapper.Error.None;
+            }
+    
+            public IEntityMapper.Error MapToRelative(IEntityMapper mapper)
+            {
+    {{~ if component.has_ref_fields ~}}
+                Entity relativeEntity;
+                IEntityMapper.Error err;
+        {{~ for member in component.component_definition.members ~}}
+                {{~ if member.c_sharp_type_name == "Entity" ~}}
+                // We assume that the inConnection held changes with unresolved references, so the 'createMapping=true' is
+                // there only because there's a chance that the parent creation change will be processed after this one
+                // meaning there's no mapping for the parent yet. This wouldn't be necessary if mapping creation would happen
+                // in the clientWorld via create/destroy requests while here we would only check whether mapping exists or not.
+                var createParentMapping_{{ member.variable_name }} = true;
+                err = mapper.MapToRelativeEntity(this.{{ member.variable_name }}, createParentMapping_{{ member.variable_name }},
+                 out relativeEntity);
+    
+                if (err != IEntityMapper.Error.None)
+                {
+                    return err;
+                }
+    
+                this.{{ member.variable_name }} = relativeEntity;
+            {{~ end ~}}
+        {{~ end ~}}
+    {{~ end ~}}
+                return IEntityMapper.Error.None;
+            }
+    
+            public ICoherenceComponentData Clone() => this;
+            public int GetComponentOrder() => order;
+            public bool IsSendOrdered() => {{ if component.component_definition.overrides["send-ordered"] }}true{{ else }}false{{ end }};
+            public bool IsWorldPositionComponent() => {{ if component.component_definition.name == "WorldPosition" || component.component_definition.base_component_name == "WorldPosition" }}true{{ else }}false{{ end }};
+    
+    {{~ for member in component.component_definition.members ~}}
+        {{~ if member.overrides["range-min"] != null && member.overrides["range-max"] != null ~}}
+            {{~ if member.c_sharp_type_name == "System.Single" || member.c_sharp_type_name == "Vector2" || member.c_sharp_type_name == "Vector3" ~}}
+            private static readonly float _{{ member.variable_name }}_Min = {{ member.overrides["range-min"] }}f;
+            private static readonly float _{{ member.variable_name }}_Max = {{ member.overrides["range-max"] }}f;
+            {{~ else if member.c_sharp_type_name == "System.Double" ~}}
+            private static readonly double _{{ member.variable_name }}_Min = {{ member.overrides["range-min"] }}d;
+            private static readonly double _{{ member.variable_name }}_Max = {{ member.overrides["range-max"] }}d;
+            {{~ else if member.c_sharp_type_name == "System.Int32" || member.c_sharp_type_name == "System.UInt32" ~}}
+            private static readonly {{ member.c_sharp_type_name }} _{{ member.variable_name }}_Min = {{ member.overrides["range-min"] }};
+            private static readonly {{ member.c_sharp_type_name }} _{{ member.variable_name }}_Max = {{ member.overrides["range-max"] }};
+            {{~ end ~}}
+        {{~ end ~}}
+    {{~ end ~}}
+    
+            public AbsoluteSimulationFrame? GetMinSimulationFrame()
+            {
+                AbsoluteSimulationFrame? min = null;
+    
+    {{~ for member in component.component_definition.members ~}}
+        {{~ if member.overrides["sim-frames"] == "true" ~}}
+                if ((FieldsMask & {{ component.component_definition.name }}.{{ member.variable_name }}Mask) != 0 && (min == null || this.{{ member.variable_name }}SimulationFrame < min))
+                {
+                    min = this.{{ member.variable_name }}SimulationFrame;
+                }
+        {{~ end ~}}
+    {{~ end ~}}
+    
+                return min;
+            }
+    
+            public ICoherenceComponentData MergeWith(ICoherenceComponentData data)
+            {
+                var other = ({{ component.component_definition.name }})data;
+                var otherMask = other.FieldsMask;
+    
+                FieldsMask |= otherMask;
+                StoppedMask &= ~(otherMask);
+    
+    {{~ for member in component.component_definition.members ~}}
+                if ((otherMask & 0x01) != 0)
+                {
+                    this.{{ member.variable_name}}SimulationFrame = other.{{ member.variable_name }}SimulationFrame;
+                    this.{{ member.variable_name }} = other.{{ member.variable_name }};
+                }
+    
+                otherMask >>= 1;
+    {{~ end ~}}
+                StoppedMask |= other.StoppedMask;
+    
+                return this;
+            }
+    
+            public uint DiffWith(ICoherenceComponentData data)
+            {
+    {{~ if no_unity_refs ~}}
+                uint mask = 0;
+                var newData = ({{ component.component_definition.name }})data;
+        {{~ for member in component.component_definition.members ~}}
+            {{~ if member.c_sharp_type_name == "Vector2" || member.c_sharp_type_name == "Vector3" || member.c_sharp_type_name == "Quaternion" || member.c_sharp_type_name == "System.Single" || member.c_sharp_type_name == "System.Double" || member.c_sharp_type_name == "System.String" || member.c_sharp_type_name == "System.Bytes[]" ~}}
+                if (this.{{ member.variable_name }}.DiffersFrom(newData.{{ member.variable_name }})) {
+                    mask |= {{ component.component_definition.name }}.{{ member.variable_name }}Mask;
+                }
+            {{~ else ~}}
+                if (this.{{ member.variable_name }} != newData.{{ member.variable_name }}) {
+                    mask |= {{ component.component_definition.name }}.{{ member.variable_name }}Mask;
+                }
+            {{~ end ~}}
+        {{~ end ~}}
+    
+                return mask;
+    {{~ else ~}}
+                throw new System.NotSupportedException($"{nameof(DiffWith)} is not supported in Unity");
+    {{~ end ~}}
+            }
+    
+    {{~ if extended_def && component.component_definition.generated_by_archetype ~}}
+            public static uint Serialize({{ component.component_definition.base_component_name }} data, bool isRefSimFrameValid, AbsoluteSimulationFrame referenceSimulationFrame, IOutProtocolBitStream bitStream, Logger logger)
+    {{~ else ~}}
+            public static uint Serialize({{ component.component_definition.name }} data, bool isRefSimFrameValid, AbsoluteSimulationFrame referenceSimulationFrame, IOutProtocolBitStream bitStream, Logger logger)
+    {{~ end ~}}
+            {
+                if (bitStream.WriteMask(data.StoppedMask != 0))
+                {
+                    bitStream.WriteMaskBits(data.StoppedMask, {{component.component_definition.members.size}});
+                }
+    
+                var mask = data.FieldsMask;
+    
+    {{~ for member in component.component_definition.members ~}}
+                if (bitStream.WriteMask((mask & 0x01) != 0))
+                {
+        {{~ if member.overrides["sim-frames"] == "true" ~}}
+                    if (isRefSimFrameValid) {
+                        var simFrameDelta = data.{{ member.variable_name }}SimulationFrame - referenceSimulationFrame;
+                        if (simFrameDelta > byte.MaxValue) {
+                            simFrameDelta = byte.MaxValue;
+                        }
+    
+                        SerializeTools.WriteFieldSimFrameDelta(bitStream, (byte)simFrameDelta);
+                    } else {
+                        SerializeTools.WriteFieldSimFrameDelta(bitStream, 0);
+                    }
+        {{~ end ~}}
+    
+        {{~ if member.overrides["range-min"] != null && member.overrides["range-max"] != null && (member.c_sharp_type_name == "System.Int32" || member.c_sharp_type_name == "System.UInt32" || member.c_sharp_type_name == "System.Single" || member.c_sharp_type_name == "Vector2" || member.c_sharp_type_name == "Vector3") ~}}
+            {{~ if member.c_sharp_type_name == "Vector2" ~}}
+                    Coherence.Utils.Bounds.Check(data.{{ member.variable_name }}.{{ if no_unity_refs }}X{{ else }}x{{ end }}, _{{ member.variable_name }}_Min, _{{ member.variable_name }}_Max, "{{ component.component_definition.name }}.{{ member.variable_name }}.x", logger);
+                    Coherence.Utils.Bounds.Check(data.{{ member.variable_name }}.{{ if no_unity_refs }}Y{{ else }}y{{ end }}, _{{ member.variable_name }}_Min, _{{ member.variable_name }}_Max, "{{ component.component_definition.name }}.{{ member.variable_name }}.y", logger);
+            {{~ else if member.c_sharp_type_name == "Vector3" ~}}
+                    Coherence.Utils.Bounds.Check(data.{{ member.variable_name }}.{{ if no_unity_refs }}X{{ else }}x{{ end }}, _{{ member.variable_name }}_Min, _{{ member.variable_name }}_Max, "{{ component.component_definition.name }}.{{ member.variable_name }}.x", logger);
+                    Coherence.Utils.Bounds.Check(data.{{ member.variable_name }}.{{ if no_unity_refs }}Y{{ else }}y{{ end }}, _{{ member.variable_name }}_Min, _{{ member.variable_name }}_Max, "{{ component.component_definition.name }}.{{ member.variable_name }}.y", logger);
+                    Coherence.Utils.Bounds.Check(data.{{ member.variable_name }}.{{ if no_unity_refs }}Z{{ else }}z{{ end }}, _{{ member.variable_name }}_Min, _{{ member.variable_name }}_Max, "{{ component.component_definition.name }}.{{ member.variable_name }}.z", logger);
+            {{~ else ~}}
+                    Coherence.Utils.Bounds.Check(data.{{ member.variable_name }}, _{{ member.variable_name }}_Min, _{{ member.variable_name }}_Max, "{{ component.component_definition.name }}.{{ member.variable_name }}", logger);
+            {{~ end ~}}
+    
+            {{~ if member.c_sharp_type_name == "System.Int32" || member.c_sharp_type_name == "System.UInt32" ~}}
+                    data.{{ member.variable_name }} = Coherence.Utils.Bounds.Clamp(data.{{ member.variable_name }}, _{{ member.variable_name }}_Min, _{{ member.variable_name }}_Max);
+            {{~ end ~}}
+        {{~ end ~}}
+    
+        {{~ if !no_unity_refs && (member.c_sharp_type_name == "Vector2" || member.c_sharp_type_name == "Vector3" || member.c_sharp_type_name == "Color" || member.c_sharp_type_name == "Quaternion") ~}}
+                    var fieldValue = (data.{{ member.variable_name }}.ToCore{{ GetSerializeMethod member.c_sharp_type_name }}());
+        {{~ else ~}}
+                    var fieldValue = data.{{ member.variable_name }};
+        {{~ end ~}}
+    
+        {{~ if component.component_definition.name == "WorldPosition" || component.component_definition.base_component_name == "WorldPosition" ~}}
+                    Coherence.Utils.Bounds.CheckPositionForNanAndInfinity(ref fieldValue, logger);
+        {{- end }}
+    
+                    bitStream.Write{{ GetSerializeMethod member.c_sharp_type_name }}(fieldValue{{ GetSerializeParams member.c_sharp_type_name member.overrides true }});
+                }
+    
+                mask >>= 1;
+    {{~ end ~}}
+    
+                return mask;
+            }
+    
+    {{~ if extended_def && component.component_definition.generated_by_archetype ~}}
+            public static {{ component.component_definition.base_component_name }} Deserialize(AbsoluteSimulationFrame referenceSimulationFrame, InProtocolBitStream bitStream)
+    {{~ else ~}}
+            public static {{ component.component_definition.name }} Deserialize(AbsoluteSimulationFrame referenceSimulationFrame, InProtocolBitStream bitStream)
+    {{~ end ~}}
+            {
+                var stoppedMask = (uint)0;
+                if (bitStream.ReadMask())
+                {
+                    stoppedMask = bitStream.ReadMaskBits({{component.component_definition.members.size}});
+                }
+    
+    {{~ if extended_def && component.component_definition.generated_by_archetype ~}}
+                var val = new {{ component.component_definition.base_component_name }}();
+    {{~ else ~}}
+                var val = new {{ component.component_definition.name }}();
+    {{~ end ~}}
+    {{~ for member in component.component_definition.members ~}}
+                if (bitStream.ReadMask())
+                {
+        {{~ if member.overrides["sim-frames"] == "true" ~}}
+                    val.{{ member.variable_name }}SimulationFrame = referenceSimulationFrame + DeserializerTools.ReadFieldSimFrameDelta(bitStream);
+        {{~ end ~}}
+    
+        {{~ if !no_unity_refs && (member.c_sharp_type_name == "Vector2" || member.c_sharp_type_name == "Vector3" || member.c_sharp_type_name == "Color" || member.c_sharp_type_name == "Quaternion") ~}}
+                    val.{{ member.variable_name }} = bitStream.Read{{ GetSerializeMethod member.c_sharp_type_name }}({{ GetSerializeParams member.c_sharp_type_name member.overrides false }}).ToUnity{{ GetSerializeMethod member.c_sharp_type_name }}();
+        {{~ else ~}}
+                    val.{{ member.variable_name }} = bitStream.Read{{ GetSerializeMethod member.c_sharp_type_name }}({{ GetSerializeParams member.c_sharp_type_name member.overrides false }});
+        {{~ end ~}}
+                    val.FieldsMask |= {{ component.component_definition.name }}.{{ member.variable_name }}Mask;
+                }
+    {{~ end ~}}
+    
+                val.StoppedMask = stoppedMask;
+    
+                return val;
+            }
+    
+    {{~ for archetype in component.archetypes ~}}
+        {{~ for lod in archetype.lods ~}}
+            {{~ for item in lod.items ~}}
+                {{~ if item.component_name == component.component_definition.name ~}}
+            public static {{ component.component_definition.name }} DeserializeArchetype{{ archetype.name }}_{{ component.component_definition.name }}_LOD{{ lod.level }}(AbsoluteSimulationFrame referenceSimulationFrame, InProtocolBitStream bitStream)
+            {
+                var stoppedMask = (uint)0;
+                if (bitStream.ReadMask())
+                {
+                    stoppedMask = bitStream.ReadMaskBits({{component.component_definition.members.size}});
+                }
+    
+                var val = new {{ component.component_definition.name }}();
+                    {{~ for member in item.fields ~}}
+                if (bitStream.ReadMask())
+                {
+                        {{~ if member.overrides["sim-frames"] == "true" ~}}
+                    val.{{ component.component_definition.members[for.index].variable_name }}SimulationFrame = referenceSimulationFrame + DeserializerTools.ReadFieldSimFrameDelta(bitStream);
+                        {{~ end ~}}
+    
+                        {{~ if !no_unity_refs && (component.component_definition.members[for.index].c_sharp_type_name == "Vector2" || component.component_definition.members[for.index].c_sharp_type_name == "Vector3" || component.component_definition.members[for.index].c_sharp_type_name == "Color" || component.component_definition.members[for.index].c_sharp_type_name == "Quaternion") ~}}
+                    val.{{ component.component_definition.members[for.index].variable_name }} = bitStream.Read{{ GetSerializeMethod component.component_definition.members[for.index].c_sharp_type_name }}({{ GetSerializeParams component.component_definition.members[for.index].c_sharp_type_name member.overrides false }}).ToUnity{{ GetSerializeMethod component.component_definition.members[for.index].c_sharp_type_name }}();
+                        {{~ else ~}}
+                    val.{{ component.component_definition.members[for.index].variable_name }} = bitStream.Read{{ GetSerializeMethod component.component_definition.members[for.index].c_sharp_type_name }}({{ GetSerializeParams component.component_definition.members[for.index].c_sharp_type_name member.overrides false }});
+                        {{~ end ~}}
+                    val.FieldsMask |= {{ component.component_definition.members[for.index].variable_name }}Mask;
+                }
+                    {{~ end ~}}
+    
+                val.StoppedMask = stoppedMask;
+    
+                return val;
+            }
+                {{~ end ~}}
+            {{~ end ~}}
+        {{~ end ~}}
+    {{~ end ~}}
+    
+            public override string ToString()
+            {
+                return $"{{ component.component_definition.name }}(" +
+    {{~ for member in component.component_definition.members ~}}
+                    $" {{ member.variable_name }}: { this.{{ member.variable_name }} }" +
+        {{~ if member.overrides["sim-frames"] == "true" ~}}
+                    $", {{ member.variable_name }}SimFrame: { this.{{ member.variable_name }}SimulationFrame }" +
+        {{~ end ~}}
+    {{~ end ~}}
+                    $" Mask: { System.Convert.ToString(FieldsMask, 2).PadLeft({{component.component_definition.members.size}}, '0') }, " +
+                    $"Stopped: { System.Convert.ToString(StoppedMask, 2).PadLeft({{component.component_definition.members.size}}, '0') })";
+            }
+        }
+    {{~ if component.component_definition.bake_conditional != "" ~}}
+    #endif // {{ component.component_definition.bake_conditional }}
+    {{~ end ~}}
+{{~ end ~}}

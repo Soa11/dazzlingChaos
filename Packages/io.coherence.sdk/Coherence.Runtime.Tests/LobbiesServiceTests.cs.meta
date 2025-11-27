@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 7ddb9514efe048d384f508b03f5de20b
+timeCreated: 1754389811
+AssetOrigin:
+  serializedVersion: 1
+  productId: 301977
+  packageName: "coherence \u2013 Multiplayer Networking"
+  packageVersion: 2.0.0
+  assetPath: Packages/io.coherence.sdk/Coherence.Runtime.Tests/LobbiesServiceTests.cs
+  uploadId: 820992

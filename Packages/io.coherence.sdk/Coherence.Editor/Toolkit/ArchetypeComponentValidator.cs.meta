@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: fe476d9e7db44d3dad0ea19c60b55cb7
+timeCreated: 1756474842
+AssetOrigin:
+  serializedVersion: 1
+  productId: 301977
+  packageName: "coherence \u2013 Multiplayer Networking"
+  packageVersion: 2.0.0
+  assetPath: Packages/io.coherence.sdk/Coherence.Editor/Toolkit/ArchetypeComponentValidator.cs
+  uploadId: 820992

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: d2f12dbf4e5b89d468d626ddadcc1112
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 301977
+  packageName: "coherence \u2013 Multiplayer Networking"
+  packageVersion: 2.0.0
+  assetPath: Packages/io.coherence.sdk/Coherence.Toolkit/Attributes/ChannelPickerAttribute.cs
+  uploadId: 820992

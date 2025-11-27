@@ -10,4 +10,5 @@ EditorBuildSettings:
     guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    io.coherence.simulator.build.options: {fileID: 11400000, guid: 4e746e31f3b9ecc43b706a0ce0ee9fc0, type: 2}
   m_UseUCBPForAssetBundles: 0

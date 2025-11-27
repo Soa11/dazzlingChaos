@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: c848f6cfe2544d81a30a053741b4feb4
+timeCreated: 1752750172
+AssetOrigin:
+  serializedVersion: 1
+  productId: 301977
+  packageName: "coherence \u2013 Multiplayer Networking"
+  packageVersion: 2.0.0
+  assetPath: Packages/io.coherence.sdk/Coherence.Editor/Migrator/LogSettingsMigrator.cs
+  uploadId: 820992

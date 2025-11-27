@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: eb7551212e2ad4448b8b817dbd26d6b2
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 301977
+  packageName: "coherence \u2013 Multiplayer Networking"
+  packageVersion: 2.0.0
+  assetPath: Packages/io.coherence.sdk/Coherence.Brook/RecyclableMemoryStream/LICENSE
+  uploadId: 820992
