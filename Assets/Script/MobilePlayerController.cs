@@ -389,7 +389,7 @@ public class MobilePlayerController : MonoBehaviour
     // ---------------------------------------------------------
     float GetForwardInput()
     {
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE
         float input = Input.GetAxis("Vertical");   // W/S, Up/Down
         if (Mathf.Abs(input) < inputDeadzone) input = 0f;
         return input;
@@ -420,7 +420,7 @@ public class MobilePlayerController : MonoBehaviour
 
     float GetTurnInput()
     {
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE
         float input = Input.GetAxis("Horizontal"); // A/D, Left/Right
         if (Mathf.Abs(input) < inputDeadzone) input = 0f;
         return input;
