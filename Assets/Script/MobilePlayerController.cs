@@ -16,7 +16,7 @@ public class MobilePlayerController : MonoBehaviour
     }
 
     // ---------- Inspector ----------
-    [Header("Rails (L01–L07)")]
+    [Header("Rails (L01-L07)")]
     public List<RailRef> rails = new List<RailRef>();
 
     [Header("Movement along rail")]
@@ -42,10 +42,25 @@ public class MobilePlayerController : MonoBehaviour
 
     [Header("Mobile Tilt Settings")]
     public bool useTiltInput = true;
-    public bool useGyro = false;
-    public float tiltDeadZone = 0.05f;
-    public float maxTilt = 0.4f;
+    public bool useGyro = false;          // start with accelerometer only
+    public float tiltDeadZone = 0.05f;    // small movements ignored
+    public float maxTilt = 0.4f;          // tilt that counts as "full" input
     public float intersectionTiltThreshold = 0.25f;
+
+    [Header("Tilt Calibration")]
+    [Tooltip("Capture the phone's tilt as neutral a short time after start")]
+    public bool autoCalibrateOnStart = true;
+
+    [Tooltip("How long after start (seconds) before we capture neutral tilt")]
+    public float calibrationDelay = 1f;
+
+    [Tooltip("Flip this if forward/back feels reversed")]
+    public bool invertForwardTilt = false;
+
+    // runtime calibration state
+    Vector3 neutralAcceleration = Vector3.zero; // what "no movement" looks like
+    bool hasNeutral = false;
+    float calibrationTimer = 0f;
 
     // ---------- Runtime ----------
     Rigidbody rb;
@@ -61,8 +76,10 @@ public class MobilePlayerController : MonoBehaviour
     float intersectionMoveResumeTime = 0f;
     bool intersectionTiltUsed = false;
 
-    bool IsMovementPaused => Time.time < intersectionMoveResumeTime;
+    bool IsMovementPaused { get { return Time.time < intersectionMoveResumeTime; } }
 
+    // ---------------------------------------------------------
+    //                       AWAKE
     // ---------------------------------------------------------
     void Awake()
     {
@@ -75,10 +92,11 @@ public class MobilePlayerController : MonoBehaviour
             return;
         }
 
+        // enable gyro if requested and supported
         if (useGyro && SystemInfo.supportsGyroscope)
             Input.gyro.enabled = true;
 
-        // Spawn
+        // Random spawn
         if (useRandomSpawnPoint && spawnPoints.Count > 0)
         {
             int spawnIndex = UnityEngine.Random.Range(0, spawnPoints.Count);
@@ -91,14 +109,16 @@ public class MobilePlayerController : MonoBehaviour
             }
         }
 
-        // Nearest rail
-        if (TryFindNearestRail(transform.position, out int idx, out float tNearest))
+        // Find nearest rail
+        int idx;
+        float tNearest;
+        if (TryFindNearestRail(transform.position, out idx, out tNearest))
         {
             CurrentRailIndex = idx;
             T = Mathf.Clamp01(tNearest);
 
-            var rr = rails[idx];
-            var sp = rr.container.Splines[rr.splineIndex];
+            RailRef rr = rails[idx];
+            Spline sp = rr.container.Splines[rr.splineIndex];
 
             Vector3 pos = rr.container.transform.TransformPoint(
                 (Vector3)SplineUtility.EvaluatePosition(sp, T)
@@ -118,6 +138,8 @@ public class MobilePlayerController : MonoBehaviour
     }
 
     // ---------------------------------------------------------
+    //                     FIXED UPDATE
+    // ---------------------------------------------------------
     void FixedUpdate()
     {
         if (IsLocked)
@@ -125,11 +147,28 @@ public class MobilePlayerController : MonoBehaviour
     }
 
     // ---------------------------------------------------------
+    //                        UPDATE
+    // ---------------------------------------------------------
     void Update()
     {
+        // Calibration on device: capture your holding pose as "neutral"
+#if !UNITY_EDITOR
+        if (useTiltInput && autoCalibrateOnStart && !hasNeutral)
+        {
+            calibrationTimer += Time.deltaTime;
+            if (calibrationTimer >= calibrationDelay)
+            {
+                neutralAcceleration = Input.acceleration;
+                hasNeutral = true;
+                // Debug.Log("Calibrated neutral tilt: " + neutralAcceleration);
+            }
+        }
+#endif
+
         if (!insideIntersection || currentIntersection == null)
             return;
 
+        // Keyboard path (Editor)
 #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
@@ -137,17 +176,20 @@ public class MobilePlayerController : MonoBehaviour
         }
 #endif
 
+        // Tilt path (device)
 #if !UNITY_EDITOR
-        if (useTiltInput)
+        if (useTiltInput && hasNeutral)
         {
-            float turnInput = GetTurnInput();
+            float turnInput = GetTurnInput(); // based on calibrated tilt x
 
+            // Left tilt (negative) behaves like pressing A once
             if (!intersectionTiltUsed && turnInput <= -intersectionTiltThreshold)
             {
                 SwitchAtIntersection(currentIntersection);
                 intersectionTiltUsed = true;
             }
 
+            // When we return toward center, allow another switch later
             if (Mathf.Abs(turnInput) < tiltDeadZone)
                 intersectionTiltUsed = false;
         }
@@ -155,13 +197,15 @@ public class MobilePlayerController : MonoBehaviour
     }
 
     // ---------------------------------------------------------
+    //             MOVEMENT WHILE LOCKED TO RAIL
+    // ---------------------------------------------------------
     void TickLocked()
     {
         if (!ValidateRail(CurrentRailIndex)) return;
 
-        var rr = rails[CurrentRailIndex];
-        var sp = rr.container.Splines[rr.splineIndex];
-        var wM = rr.container.transform.localToWorldMatrix;
+        RailRef rr = rails[CurrentRailIndex];
+        Spline sp = rr.container.Splines[rr.splineIndex];
+        Matrix4x4 wM = rr.container.transform.localToWorldMatrix;
 
         float input = GetForwardInput();
         float targetSpeed = IsMovementPaused ? 0f : input * maxSpeed;
@@ -192,7 +236,9 @@ public class MobilePlayerController : MonoBehaviour
 
         Quaternion want = Quaternion.LookRotation(tangent, Vector3.up);
         Quaternion dq = want * Quaternion.Inverse(rb.rotation);
-        dq.ToAngleAxis(out float ang, out Vector3 axis);
+        float ang;
+        Vector3 axis;
+        dq.ToAngleAxis(out ang, out axis);
 
         if (ang > 180f) ang -= 360f;
 
@@ -207,9 +253,11 @@ public class MobilePlayerController : MonoBehaviour
     }
 
     // ---------------------------------------------------------
+    //                     INTERSECTION TRIGGERS
+    // ---------------------------------------------------------
     void OnTriggerEnter(Collider other)
     {
-        var node = other.GetComponent<IntersectionNode>();
+        IntersectionNode node = other.GetComponent<IntersectionNode>();
         if (!node) return;
 
         insideIntersection = true;
@@ -221,7 +269,7 @@ public class MobilePlayerController : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
-        var node = other.GetComponent<IntersectionNode>();
+        IntersectionNode node = other.GetComponent<IntersectionNode>();
         if (!node) return;
 
         if (node == currentIntersection)
@@ -233,11 +281,15 @@ public class MobilePlayerController : MonoBehaviour
     }
 
     // ---------------------------------------------------------
+    //                SWITCH TO OTHER RAIL
+    // ---------------------------------------------------------
     void SwitchAtIntersection(IntersectionNode node)
     {
-        var currentRail = rails[CurrentRailIndex].container;
+        SplineContainer currentRail = rails[CurrentRailIndex].container;
 
-        if (!node.GetOther(currentRail, out var otherContainer, out int otherIndex))
+        SplineContainer otherContainer;
+        int otherIndex;
+        if (!node.GetOther(currentRail, out otherContainer, out otherIndex))
             return;
 
         int targetIndex = -1;
@@ -252,13 +304,14 @@ public class MobilePlayerController : MonoBehaviour
         }
         if (targetIndex < 0) return;
 
-        var rr = rails[targetIndex];
-        var sp = rr.container.Splines[rr.splineIndex];
+        RailRef rr = rails[targetIndex];
+        Spline sp = rr.container.Splines[rr.splineIndex];
 
         Vector3 worldPos = transform.position;
         Vector3 localPos = rr.container.transform.InverseTransformPoint(worldPos);
 
-        float3 nL; float t;
+        float3 nL;
+        float t;
         SplineUtility.GetNearestPoint(sp, (float3)localPos, out nL, out t);
 
         T = Mathf.Clamp01(t);
@@ -278,6 +331,9 @@ public class MobilePlayerController : MonoBehaviour
     }
 
     // ---------------------------------------------------------
+    //                    INPUT HELPERS
+    // ---------------------------------------------------------
+    // Forward/backward: Editor uses W/S; device uses calibrated tilt
     float GetForwardInput()
     {
 #if UNITY_EDITOR
@@ -292,8 +348,12 @@ public class MobilePlayerController : MonoBehaviour
             return input;
         }
 
-        Vector2 tilt = GetTilt();
-        float inputTilt = tilt.y;
+        if (!hasNeutral) return 0f; // not calibrated yet
+
+        Vector2 tilt = GetTilt(); // x = left/right, y = forward/back relative to neutral
+
+        float sign = invertForwardTilt ? -1f : 1f;
+        float inputTilt = sign * tilt.y;
 
         if (Mathf.Abs(inputTilt) < tiltDeadZone)
             inputTilt = 0f;
@@ -305,6 +365,7 @@ public class MobilePlayerController : MonoBehaviour
 #endif
     }
 
+    // Left/right: Editor uses A/D; device uses calibrated tilt X (for intersections)
     float GetTurnInput()
     {
 #if UNITY_EDITOR
@@ -312,6 +373,8 @@ public class MobilePlayerController : MonoBehaviour
 #else
         if (!useTiltInput)
             return Input.GetAxis("Horizontal");
+
+        if (!hasNeutral) return 0f;
 
         Vector2 tilt = GetTilt();
         float x = tilt.x;
@@ -326,9 +389,10 @@ public class MobilePlayerController : MonoBehaviour
 #endif
     }
 
-    // ---------------------------------------------------------
+    // Returns calibrated tilt: x = left/right, y = forward/back relative to neutral pose
     Vector2 GetTilt()
     {
+        // Gyro path (if you later enable it)
         if (useGyro && SystemInfo.supportsGyroscope)
         {
             Quaternion q = Input.gyro.attitude;
@@ -342,10 +406,16 @@ public class MobilePlayerController : MonoBehaviour
             return new Vector2(tiltSide, -tiltForward);
         }
 
+        // Accelerometer path with neutral calibration
         Vector3 acc = Input.acceleration;
-        return new Vector2(acc.x, acc.y);
+
+        Vector3 delta = acc - neutralAcceleration;
+
+        return new Vector2(delta.x, delta.y);
     }
 
+    // ---------------------------------------------------------
+    //                    RAIL HELPERS
     // ---------------------------------------------------------
     bool TryFindNearestRail(Vector3 pos, out int bestIdx, out float bestT)
     {
@@ -357,11 +427,12 @@ public class MobilePlayerController : MonoBehaviour
         {
             if (!ValidateRail(i)) continue;
 
-            var rr = rails[i];
-            var sp = rr.container.Splines[rr.splineIndex];
+            RailRef rr = rails[i];
+            Spline sp = rr.container.Splines[rr.splineIndex];
 
             Vector3 qL = rr.container.transform.InverseTransformPoint(pos);
-            float3 nL; float t;
+            float3 nL;
+            float t;
             SplineUtility.GetNearestPoint(sp, (float3)qL, out nL, out t);
 
             Vector3 nW = rr.container.transform.TransformPoint((Vector3)nL);
@@ -380,7 +451,7 @@ public class MobilePlayerController : MonoBehaviour
     bool ValidateRail(int i)
     {
         if (i < 0 || i >= rails.Count) return false;
-        var r = rails[i];
+        RailRef r = rails[i];
         if (!r.container) return false;
 
         var list = r.container.Splines;
