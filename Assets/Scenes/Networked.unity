@@ -441,8 +441,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6442dc8070ceb41f094e44de0bf87274, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Mirror::Mirror.NetworkManagerHUD
-  offsetX: 0
-  offsetY: 0
+  offsetX: 559
+  offsetY: 219
 --- !u!114 &145406155
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -497,7 +497,7 @@ Transform:
   m_GameObject: {fileID: 145406153}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 42.5134, y: 114.059, z: 101.46049}
+  m_LocalPosition: {x: 43.146, y: 114.304, z: 101.46049}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -809,6 +809,7 @@ MonoBehaviour:
   m_Script: {fileID: 1909489390}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &231612070
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49169,6 +49170,7 @@ MonoBehaviour:
   m_Script: {fileID: 1012161356}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &306000071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -97851,6 +97853,7 @@ MonoBehaviour:
   m_Script: {fileID: 1909489390}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &425046045
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146773,6 +146776,7 @@ MonoBehaviour:
   m_Script: {fileID: 1295221894}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &768893763
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195534,6 +195538,7 @@ MonoBehaviour:
   m_Script: {fileID: 1909489390}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &863149079
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244149,6 +244154,7 @@ MonoBehaviour:
   m_Script: {fileID: 1909489390}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &997896912
 MonoBehaviour:
   m_ObjectHideFlags: 0
