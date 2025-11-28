@@ -11,9 +11,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Networked.unity
     guid: 2451d21ce1a89a649a8350f95467acd7
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Mobile.unity
     guid: 39b3f15a42ed7cb4a99b8786143a4019
+  - enabled: 1
+    path: Assets/Scenes/PrototypeBuild.unity
+    guid: 0571e813ced7d644abc17e8aea001968
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

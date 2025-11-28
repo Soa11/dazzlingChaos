@@ -146361,10 +146361,10 @@ MonoBehaviour:
     splineIndex: 0
   - container: {fileID: 306000071}
     splineIndex: 0
-  maxSpeed: 12
+  maxSpeed: 16
   accel: 18
   inputDeadzone: 0.05
-  slopeSpeedFactor: 10
+  slopeSpeedFactor: 20
   posSpring: 80
   posDamping: 12
   rotTorque: 28
