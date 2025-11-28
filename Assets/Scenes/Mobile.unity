@@ -97248,8 +97248,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1951063892}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &316242293
@@ -146474,23 +146473,34 @@ MonoBehaviour:
     splineIndex: 0
   - container: {fileID: 306000071}
     splineIndex: 0
-  maxSpeed: 12
-  accel: 12
+  maxSpeed: 16
+  accel: 18
   inputDeadzone: 0.05
+  slopeSpeedFactor: 20
   posSpring: 80
   posDamping: 12
   rotTorque: 28
   rotDamping: 8
+  maxBankAngle: 10
   playerOffset: {x: -0.1, y: 0.5, z: 0}
   intersectionStopDuration: 2
   useRandomSpawnPoint: 1
   spawnPoints:
   - {fileID: 1819363368}
+  - {fileID: 1633780687}
+  - {fileID: 1735705741}
+  - {fileID: 806538847}
+  - {fileID: 1784452048}
+  - {fileID: 237743558}
+  - {fileID: 148270775}
   useTiltInput: 1
-  useGyro: 1
+  useGyro: 0
   tiltDeadZone: 0.05
   maxTilt: 0.4
   intersectionTiltThreshold: 0.25
+  autoCalibrateOnStart: 1
+  calibrationDelay: 1
+  invertForwardTilt: 0
 --- !u!135 &689254152
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -343480,7 +343490,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 306000072}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2032886719
 GameObject:
@@ -344558,6 +344568,7 @@ SceneRoots:
   - {fileID: 863149080}
   - {fileID: 425046046}
   - {fileID: 997896913}
+  - {fileID: 1951063892}
   - {fileID: 306000072}
   - {fileID: 1213499193}
   - {fileID: 1889748891}

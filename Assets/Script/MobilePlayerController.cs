@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Splines;
 using Unity.Mathematics;   // for float3, SplineUtility
@@ -20,15 +20,23 @@ public class MobilePlayerController : MonoBehaviour
     public List<RailRef> rails = new List<RailRef>();
 
     [Header("Movement along rail")]
-    public float maxSpeed = 12f;
-    public float accel = 12f;
+    public float maxSpeed = 16f;
+    public float accel = 18f;
     public float inputDeadzone = 0.05f;
+
+    [Header("Slope / Coaster Feel")]
+    [Tooltip("How strongly slopes affect speed. Larger = more dramatic uphill/downhill difference.")]
+    public float slopeSpeedFactor = 12f;   // try 10–18
 
     [Header("Rail spring forces")]
     public float posSpring = 80f;
     public float posDamping = 12f;
     public float rotTorque = 28f;
     public float rotDamping = 8f;
+
+    [Header("Visual banking")]
+    [Tooltip("Max visual lean angle (deg) left/right based on horizontal input/tilt.")]
+    public float maxBankAngle = 10f;
 
     [Header("Offsets")]
     public Vector3 playerOffset = Vector3.zero;
@@ -57,8 +65,8 @@ public class MobilePlayerController : MonoBehaviour
     [Tooltip("Flip this if forward/back feels reversed")]
     public bool invertForwardTilt = false;
 
-    // runtime calibration state
-    Vector3 neutralAcceleration = Vector3.zero; // what "no movement" looks like
+    // runtime calibration state (mobile)
+    Vector3 neutralAcceleration = Vector3.zero;
     bool hasNeutral = false;
     float calibrationTimer = 0f;
 
@@ -66,10 +74,10 @@ public class MobilePlayerController : MonoBehaviour
     Rigidbody rb;
 
     public int CurrentRailIndex { get; private set; } = 0;
-    public float T { get; private set; } = 0f;
+    public float T { get; private set; } = 0f;   // 0–1 along current spline
     public bool IsLocked { get; private set; } = true;
 
-    float vAlong = 0f;
+    float vAlong = 0f; // desired speed along track
 
     IntersectionNode currentIntersection;
     bool insideIntersection = false;
@@ -92,7 +100,6 @@ public class MobilePlayerController : MonoBehaviour
             return;
         }
 
-        // enable gyro if requested and supported
         if (useGyro && SystemInfo.supportsGyroscope)
             Input.gyro.enabled = true;
 
@@ -151,8 +158,8 @@ public class MobilePlayerController : MonoBehaviour
     // ---------------------------------------------------------
     void Update()
     {
-        // Calibration on device: capture your holding pose as "neutral"
 #if !UNITY_EDITOR
+        // Mobile: calibrate neutral tilt after a short delay
         if (useTiltInput && autoCalibrateOnStart && !hasNeutral)
         {
             calibrationTimer += Time.deltaTime;
@@ -160,7 +167,6 @@ public class MobilePlayerController : MonoBehaviour
             {
                 neutralAcceleration = Input.acceleration;
                 hasNeutral = true;
-                // Debug.Log("Calibrated neutral tilt: " + neutralAcceleration);
             }
         }
 #endif
@@ -168,28 +174,29 @@ public class MobilePlayerController : MonoBehaviour
         if (!insideIntersection || currentIntersection == null)
             return;
 
-        // Keyboard path (Editor)
+        // Editor: keyboard A/D and arrows to switch
 #if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow) ||
+            Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
         {
             SwitchAtIntersection(currentIntersection);
         }
 #endif
 
-        // Tilt path (device)
+        // Mobile: horizontal tilt (left OR right) triggers intersection switch
 #if !UNITY_EDITOR
         if (useTiltInput && hasNeutral)
         {
-            float turnInput = GetTurnInput(); // based on calibrated tilt x
+            float turnInput = GetTurnInput(); // from tilt.x
 
-            // Left tilt (negative) behaves like pressing A once
-            if (!intersectionTiltUsed && turnInput <= -intersectionTiltThreshold)
+            // Either side, once per lean
+            if (!intersectionTiltUsed && Mathf.Abs(turnInput) >= intersectionTiltThreshold)
             {
                 SwitchAtIntersection(currentIntersection);
                 intersectionTiltUsed = true;
             }
 
-            // When we return toward center, allow another switch later
+            // When they come back near center, re-arm
             if (Mathf.Abs(turnInput) < tiltDeadZone)
                 intersectionTiltUsed = false;
         }
@@ -197,7 +204,7 @@ public class MobilePlayerController : MonoBehaviour
     }
 
     // ---------------------------------------------------------
-    //             MOVEMENT WHILE LOCKED TO RAIL
+    //           MOVEMENT WHILE LOCKED TO RAIL (COASTER FEEL)
     // ---------------------------------------------------------
     void TickLocked()
     {
@@ -207,34 +214,80 @@ public class MobilePlayerController : MonoBehaviour
         Spline sp = rr.container.Splines[rr.splineIndex];
         Matrix4x4 wM = rr.container.transform.localToWorldMatrix;
 
-        float input = GetForwardInput();
-        float targetSpeed = IsMovementPaused ? 0f : input * maxSpeed;
+        // Evaluate tangent at current T
+        Vector3 tangent = rr.container.transform.TransformDirection(
+            (Vector3)SplineUtility.EvaluateTangent(sp, T)
+        ).normalized;
 
+        // Slope: dot of tangent with world "down"
+        // slope > 0 → downhill (pointing downwards)
+        // slope < 0 → uphill
+        float slope = Vector3.Dot(tangent.normalized, Vector3.down);
+
+        // Input-based base target speed (keyboard or tilt)
+        float input = GetForwardInput();
+        float baseTargetSpeed = input * maxSpeed;
+
+        // -------- Adjusted slope logic: softer uphill, stronger downhill --------
+        float targetSpeed;
+        if (IsMovementPaused)
+        {
+            targetSpeed = 0f;
+        }
+        else
+        {
+            float uphill = Mathf.Max(0f, -slope);  // 0..1 uphill
+            float downhill = Mathf.Max(0f, slope);  // 0..1 downhill
+
+            // Softer uphill punishment
+            float uphillPunish = 1f - uphill * slopeSpeedFactor * 0.10f;
+
+            // Stronger downhill boost
+            float downhillBoost = 1f + downhill * slopeSpeedFactor * 0.08f;
+
+            float slopeFactor = uphillPunish * downhillBoost;
+
+            // Never fully kill motion, allow stronger boost
+            slopeFactor = Mathf.Clamp(slopeFactor, 0.2f, 4f);
+
+            targetSpeed = baseTargetSpeed * slopeFactor;
+        }
+
+        // Smooth vAlong towards target
         if (IsMovementPaused)
             vAlong = 0f;
         else
             vAlong = Mathf.MoveTowards(vAlong, targetSpeed, accel * Time.fixedDeltaTime);
 
+        // Advance T along the spline based on vAlong
         float length = Mathf.Max(0.001f, SplineUtility.CalculateLength(sp, wM));
         T += (vAlong * Time.fixedDeltaTime) / length;
         T = Mathf.Clamp01(T);
 
+        // Position + tangent at new T
         Vector3 railPos = rr.container.transform.TransformPoint(
             (Vector3)SplineUtility.EvaluatePosition(sp, T)
         ) + playerOffset;
 
-        Vector3 tangent = rr.container.transform.TransformDirection(
+        tangent = rr.container.transform.TransformDirection(
             (Vector3)SplineUtility.EvaluateTangent(sp, T)
         ).normalized;
 
+        // Spring to rail
         Vector3 toTarget = railPos - rb.position;
         Vector3 springAccel = posSpring * toTarget - posDamping * rb.linearVelocity;
         rb.AddForce(springAccel, ForceMode.Acceleration);
 
+        // Drive RB velocity along tangent to match vAlong
         float vNow = Vector3.Dot(rb.linearVelocity, tangent);
         rb.AddForce(tangent * ((vAlong - vNow) / Time.fixedDeltaTime), ForceMode.Acceleration);
 
-        Quaternion want = Quaternion.LookRotation(tangent, Vector3.up);
+        // Rotation + banking
+        float bankInput = Mathf.Clamp(GetTurnInput(), -1f, 1f);
+        float bankAngle = bankInput * maxBankAngle;
+        Vector3 bankedUp = Quaternion.AngleAxis(bankAngle, tangent) * Vector3.up;
+
+        Quaternion want = Quaternion.LookRotation(tangent, bankedUp);
         Quaternion dq = want * Quaternion.Inverse(rb.rotation);
         float ang;
         Vector3 axis;
@@ -307,7 +360,7 @@ public class MobilePlayerController : MonoBehaviour
         RailRef rr = rails[targetIndex];
         Spline sp = rr.container.Splines[rr.splineIndex];
 
-        Vector3 worldPos = transform.position;
+        Vector3 worldPos = transform.position - playerOffset;
         Vector3 localPos = rr.container.transform.InverseTransformPoint(worldPos);
 
         float3 nL;
@@ -324,20 +377,20 @@ public class MobilePlayerController : MonoBehaviour
 
         rb.position = newWorldPos;
         transform.position = newWorldPos;
-        transform.rotation = Quaternion.LookRotation(tangent, Vector3.up);
 
         float speed = Vector3.Dot(rb.linearVelocity, tangent);
         rb.linearVelocity = tangent * speed;
+
+        transform.rotation = Quaternion.LookRotation(tangent, Vector3.up);
     }
 
     // ---------------------------------------------------------
     //                    INPUT HELPERS
     // ---------------------------------------------------------
-    // Forward/backward: Editor uses W/S; device uses calibrated tilt
     float GetForwardInput()
     {
 #if UNITY_EDITOR
-        float input = Input.GetAxis("Vertical");
+        float input = Input.GetAxis("Vertical");   // W/S, Up/Down
         if (Mathf.Abs(input) < inputDeadzone) input = 0f;
         return input;
 #else
@@ -365,11 +418,12 @@ public class MobilePlayerController : MonoBehaviour
 #endif
     }
 
-    // Left/right: Editor uses A/D; device uses calibrated tilt X (for intersections)
     float GetTurnInput()
     {
 #if UNITY_EDITOR
-        return Input.GetAxis("Horizontal");
+        float input = Input.GetAxis("Horizontal"); // A/D, Left/Right
+        if (Mathf.Abs(input) < inputDeadzone) input = 0f;
+        return input;
 #else
         if (!useTiltInput)
             return Input.GetAxis("Horizontal");
@@ -389,10 +443,8 @@ public class MobilePlayerController : MonoBehaviour
 #endif
     }
 
-    // Returns calibrated tilt: x = left/right, y = forward/back relative to neutral pose
     Vector2 GetTilt()
     {
-        // Gyro path (if you later enable it)
         if (useGyro && SystemInfo.supportsGyroscope)
         {
             Quaternion q = Input.gyro.attitude;
@@ -406,9 +458,7 @@ public class MobilePlayerController : MonoBehaviour
             return new Vector2(tiltSide, -tiltForward);
         }
 
-        // Accelerometer path with neutral calibration
         Vector3 acc = Input.acceleration;
-
         Vector3 delta = acc - neutralAcceleration;
 
         return new Vector2(delta.x, delta.y);
