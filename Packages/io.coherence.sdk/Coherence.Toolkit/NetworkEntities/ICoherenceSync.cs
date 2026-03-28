@@ -1,0 +1,168 @@
+// Copyright (c) coherence ApS.
+// See the license file in the package root for more information.
+
+namespace Coherence.Toolkit
+{
+    using Bindings;
+    using Entities;
+    using ProtocolDef;
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using UnityEngine;
+    using Common;
+    using UnityEngine.Events;
+
+    public interface ICoherenceSync
+    {
+        event UnityAction OnStateAuthority
+        {
+            add => Warning($"{GetType().Name} does not implement {nameof(OnStateAuthority)}.");
+            remove { }
+        }
+
+        event UnityAction OnInputAuthority
+        {
+            add => Warning($"{GetType().Name} does not implement {nameof(OnInputAuthority)}.");
+            remove { }
+        }
+
+        event UnityAction OnStateRemote
+        {
+            add => Warning($"{GetType().Name} does not implement {nameof(OnStateRemote)}.");
+            remove { }
+        }
+
+        UnityEvent OnInputSimulatorConnected => null;
+
+        bool Adopt() => CoherenceBridge.AuthorityManager.Adopt(EntityState);
+
+        /// <summary>
+        /// Requests authority over this entity.
+        /// </summary>
+        /// <param name="authorityType">Type of authority transferred.</param>
+        /// <param name="cancellationToken">Token that can be used to cancel the authority request.</param>
+        /// <remarks>
+        /// Requires a valid <see cref="CoherenceBridge"/> instance to process the transfer request.
+        /// </remarks>
+        /// <returns>
+        /// Task representing the asynchronous operation.
+        /// </returns>
+        public Task<RequestAuthorityResult> RequestAuthorityAsync(AuthorityType authorityType, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Request authority over this entity.
+        /// </summary>
+        /// <param name="authorityType">
+        /// <para>
+        /// The type of control requested over the entity.
+        /// </para>
+        /// <para>
+        /// This should not be <see cref="AuthorityType.None"/>, nor match the current authority type.
+        /// </para>
+        /// </param>
+        /// <param name="onRequestFinished">
+        /// Callback invoked when the authority request has <see cref="RequestAuthorityResultType.Success">succeeded</see>,
+        /// failed, or been <see cref="RequestAuthorityResultType.Canceled">canceled</see>.
+        /// </param>
+        /// <param name="cancellationToken"> Token that can be used to cancel the authority request. </param>
+        void RequestAuthority(AuthorityType authorityType, [MaybeNull] Action<RequestAuthorityResult> onRequestFinished, CancellationToken cancellationToken = default);
+
+        bool RequestAuthority(AuthorityType authorityType) => CoherenceBridge.AuthorityManager.RequestAuthority(EntityState, authorityType);
+
+        bool HasStateAuthority => EntityState?.AuthorityType.Value.ControlsState() ?? true;
+
+        bool IsOrphaned => EntityState?.IsOrphaned ?? false;
+
+        bool HasInputAuthority => EntityState?.AuthorityType.Value.ControlsInput() ?? true;
+
+        bool IsSynchronizedWithNetwork => EntityState != null;
+
+        CoherenceSyncConfig CoherenceSyncConfig { get; }
+
+        [MaybeNull]
+        NetworkEntityState EntityState { get; }
+
+        CoherenceSync.SimulationType SimulationTypeConfig { get; }
+        CoherenceSync.LifetimeType LifetimeTypeConfig { get; }
+        CoherenceSync.AuthorityTransferType AuthorityTransferTypeConfig { get; }
+        ICoherenceBridge CoherenceBridge { get; }
+        ICoherenceSyncUpdater Updater { get; }
+        string name { get; }
+        Transform transform { get; }
+        GameObject gameObject { get; }
+        bool PreserveChildren { get; }
+        bool HasInput { get; }
+        bool UsesLODsAtRuntime { get; }
+        string ArchetypeName { get; }
+        bool HasParentWithCoherenceSync { get; }
+        string ManualUniqueId { get; }
+        CoherenceInput Input { get; }
+        CoherenceSyncBaked BakedScript { get; }
+        Vector3 coherencePosition { get; }
+        bool IsUnique { get; }
+        bool IsGlobal { get; }
+
+        /// <summary>
+        /// Returns <see langword="true"/> if the object has been
+        /// <see cref="UnityEngine.Object.Destroy(UnityEngine.Object)">destroyed</see>
+        /// or is in the process of being unloaded; otherwise, <see langword="false"/>.
+        /// </summary>
+        bool IsDestroyed => false;
+
+        CoherenceSync.UniqueObjectReplacementStrategy ReplacementStrategy { get; }
+        CoherenceSync.UnsyncedNetworkEntityPriority UnsyncedEntityPriority { get; }
+        CoherenceSync ConnectedEntity { get; }
+        string SynchronizationChannel { get; }
+
+        void HandleNetworkedDestruction(bool destroyAsParent);
+        void DestroyAsDuplicate();
+        void ReceiveCommand(IEntityCommand command, MessageTarget target);
+        void HandleDisconnected();
+        void ResetInterpolation(bool setToLastSamples = false);
+        void SetObservedLodLevel(int lod);
+        void RaiseOnAuthorityRequested(AuthorityRequest request);
+        bool TryGetBindingByGuid(string bindingGuid, out Binding outBinding);
+        void OnNetworkCommandReceived(object sender, byte[] data);
+        void InitializeReplacedUniqueObject(SpawnInfo info);
+        bool IsChildFromSyncGroup();
+
+        T GetBakedValueBinding<T>(string bindingName = null) where T : Binding;
+
+        CoherenceSync.InterpolationLoop InterpolationLocationConfig { get; }
+        CoherenceSync.OrphanedBehavior OrphanedBehaviorConfig { get; }
+        List<Binding> Bindings { get; }
+        void SendConnectedEntity(double time);
+        void ValidateConnectedEntity();
+
+        /// <summary>
+        /// Executed automatically when the networked entity that this entity is connected to has changed.
+        /// </summary>
+        /// <param name="newConnectedEntityID">
+        /// Identifier of the new connected entity, if any; otherwise, <see cref="Entity.InvalidRelative"/>.
+        /// </param>
+        /// <param name="didChangeParent">
+        /// When this method returns, contains <see langword="true"/> if the <see cref="Transform.parent"/> of this
+        /// <see cref="GameObject"/> changed during the execution of this method; otherwise, <see langword="false"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if succeeded in reacting to the change without encountering any issues; otherwise, <see langword="false"/>.
+        /// </returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        bool ConnectedEntityChanged(Entity newConnectedEntityID, out bool didChangeParent);
+
+        string CoherenceTag { get; set; }
+        void ApplyNodeBindings();
+
+        bool ShouldShift();
+        bool ShiftOrigin(Vector3d delta);
+        Action<Vector3, Vector3> OnFloatingOriginShifted { get; set; }
+
+        void RaiseOnConnectedEntityChanged();
+
+        private void Warning(string message) => Log.Log.GetLogger(GetType(), this).Warning(Log.Warning.ToolkitInterfaceUnsupported, message);
+    }
+}

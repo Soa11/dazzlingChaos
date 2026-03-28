@@ -8,11 +8,14 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Networked.unity
     guid: 2451d21ce1a89a649a8350f95467acd7
+  - enabled: 1
+    path: Assets/Scenes/NetworkingTest.unity
+    guid: 06fbf6a4ad0897f4795fd0d83a0c660f
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-    io.coherence.simulator.build.options: {fileID: 11400000, guid: 4e746e31f3b9ecc43b706a0ce0ee9fc0, type: 2}
+    io.coherence.simulator.build.options: {fileID: 11400000, guid: 8120bf014e19a5246881a128169006f4, type: 2}
   m_UseUCBPForAssetBundles: 0

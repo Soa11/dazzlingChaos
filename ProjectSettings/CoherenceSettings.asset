@@ -14,12 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Coherence.Editor::Coherence.Editor.ProjectSettings
   showHubModuleQuickHelp: 1
   portalToken: 
-  worldUDPPort: 32001
-  worldWebPort: 32002
-  roomsUDPPort: 42001
-  roomsWebPort: 42002
-  sendFrequency: 20
-  recvFrequency: 60
   localRoomsCleanupTimeSeconds: 120
   localWorldHostAuthority: 0
   rsConsoleLogLevel: 2
@@ -31,8 +25,12 @@ MonoBehaviour:
   keepConnectionAlive: 0
   activeSchemas: []
   organization:
-    id: 
-    name: 
-    slug: 
-    projects: []
+    id: d737ka6nqj7v8j21i7ug
+    name: Soa J Hwang
+    slug: soa-j-hwang
+    projects:
+    - id: d737kaenqj7v8j21i800
+      portal_token: 1080e997a8064835952efb36c0d61f63
+      runtime_key: a81318fdc7c946a9ab345621f8141b9b
+      name: Default Project
   multipleProjects: []

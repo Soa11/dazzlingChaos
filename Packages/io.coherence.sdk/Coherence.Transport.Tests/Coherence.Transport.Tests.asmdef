@@ -1,0 +1,46 @@
+{
+    "name": "Coherence.Transport.Tests",
+    "rootNamespace": "Coherence.Transport.Tests",
+    "references": [
+        "Coherence.Brook",
+        "Coherence.Brisk",
+        "Coherence.Common",
+        "Coherence.Common.Tests",
+        "Coherence.Connection.Web",
+        "Coherence.Log",
+        "Coherence.Transport",
+        "Coherence.Stats",
+        "Coherence.Tests",
+        "UnityEditor.TestRunner",
+        "UnityEngine.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Moq.dll",
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS",
+        "HAS_UTF",
+        "HAS_MOQ"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.test-framework",
+            "expression": "1.4.4",
+            "define": "HAS_UTF"
+        },
+        {
+            "name": "nuget.moq",
+            "expression": "2.0.0",
+            "define": "HAS_MOQ"
+        }
+    ],
+    "noEngineReferences": false
+}

@@ -1,0 +1,17 @@
+{
+    "name": "Coherence.PingClient",
+    "rootNamespace": "",
+    "references": [
+        "Coherence.Log",
+        "Coherence.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

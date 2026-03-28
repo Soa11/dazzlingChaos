@@ -1,0 +1,62 @@
+{
+    "name": "Coherence.Toolkit",
+    "rootNamespace": "",
+    "references": [
+        "Coherence",
+        "Coherence.Brisk",
+        "Coherence.Brook",
+        "Coherence.Common",
+        "Coherence.Core",
+        "Coherence.Cram",
+        "Coherence.Entities",
+        "Coherence.Interpolation",
+        "Coherence.Log",
+        "Coherence.Plugins",
+        "Coherence.Prefs",
+        "Coherence.ProtocolDef",
+        "Coherence.ReplicationServer",
+        "Coherence.Runtime",
+        "Coherence.Serializer",
+        "Coherence.SimulationFrame",
+        "Coherence.Transport",
+        "Coherence.Utils",
+        "Coherence.Stats",
+        "Unity.Addressables",
+        "Unity.Profiling.Core",
+        "Unity.ResourceManager",
+        "Unity.TextMeshPro",
+        "Coherence.Debugging"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.addressables",
+            "expression": "1.15.0",
+            "define": "HAS_ADDRESSABLES"
+        },
+        {
+            "name": "io.coherence.rsl",
+            "expression": "0.0.1",
+            "define": "COHERENCE_HAS_RSL"
+        },
+        {
+            "name": "com.unity.modules.uielements",
+            "expression": "",
+            "define": "HAS_UI_TOOLKIT"
+        },
+        {
+            "name": "com.unity.textmeshpro",
+            "expression": "",
+            "define": "HAS_TEXT_MESH_PRO"
+        }
+    ],
+    "noEngineReferences": false
+}
