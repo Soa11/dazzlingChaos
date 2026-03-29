@@ -23,9 +23,9 @@ MonoBehaviour:
     SourceFilters: 
     LogToFile: 0
     LogFilePath: Logs/player_logs.txt
-    MigratedToSerializedObject: 1
+    MigratedToSerializedObject: 0
     FileLogLevel: 1
-  schemaID: 2df6c3f5be4b05afc407f017cd497d8af3b7185d
+  schemaID: a49c8ce95106173d143c662e85b512519e0e8ac6
   versionInfo: {fileID: 11400000, guid: 2191b6f902c97477baa32a7919010503, type: 2}
   runtimeKey: 
   simulatorSlug: 
@@ -57,7 +57,6 @@ MonoBehaviour:
   storedSdkVersionBuildMetadata: 
   schemas:
   - {fileID: -1758743643018166929, guid: 266a112c2c9e941a58a87a48e7a4f8cb, type: 3}
-  - {fileID: -1758743643018166929, guid: 939644948eba1c14aaaac14151885645, type: 3}
   extraSchemas: []
   defaultAuthorityTransferType: 2
   simulatorLockTargetFramerate: 1
