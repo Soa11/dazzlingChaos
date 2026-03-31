@@ -6,8 +6,6 @@ using UnityEngine.UIElements;
 public class SessionToNGOBridge : MonoBehaviour
 {
     [SerializeField] private UIDocument joinCodeDocument;
-    [SerializeField] private bool startAsHost;
-    [SerializeField] private bool startAsClient;
 
     private bool ngoStarted = false;
     private float startupDelay = 0f;
@@ -23,7 +21,6 @@ public class SessionToNGOBridge : MonoBehaviour
 
         if (NetworkManager.Singleton.IsListening)
         {
-            Debug.Log("Bridge: NGO already listening");
             return;
         }
 
@@ -49,21 +46,21 @@ public class SessionToNGOBridge : MonoBehaviour
         if (string.IsNullOrEmpty(uiText)) return;
         if (uiText.Contains("No Session joined")) return;
 
-        if (startAsHost)
+        bool isEditor = Application.isEditor;
+        bool shouldStartHost = isEditor;      // Editor = Host
+        bool shouldStartClient = !isEditor;   // Build = Client
+
+        if (shouldStartHost)
         {
-            Debug.Log("Bridge: Session detected -> StartHost");
+            Debug.Log("Bridge: StartHost");
             NetworkManager.Singleton.StartHost();
             ngoStarted = true;
         }
-        else if (startAsClient)
+        else if (shouldStartClient)
         {
-            Debug.Log("Bridge: Session detected -> StartClient");
+            Debug.Log("Bridge: StartClient");
             NetworkManager.Singleton.StartClient();
             ngoStarted = true;
-        }
-        else
-        {
-            Debug.Log("Bridge: Neither host nor client selected");
         }
     }
 
@@ -75,7 +72,8 @@ public class SessionToNGOBridge : MonoBehaviour
         {
             if (!string.IsNullOrEmpty(label.text))
             {
-                sb.Append(label.text).Append(" ");
+                sb.Append(label.text);
+                sb.Append(" ");
             }
         }
 
@@ -83,7 +81,8 @@ public class SessionToNGOBridge : MonoBehaviour
         {
             if (!string.IsNullOrEmpty(textField.value))
             {
-                sb.Append(textField.value).Append(" ");
+                sb.Append(textField.value);
+                sb.Append(" ");
             }
         }
 
@@ -91,7 +90,8 @@ public class SessionToNGOBridge : MonoBehaviour
         {
             if (!string.IsNullOrEmpty(button.text))
             {
-                sb.Append(button.text).Append(" ");
+                sb.Append(button.text);
+                sb.Append(" ");
             }
         }
 
