@@ -10,10 +10,14 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 625823154146548787, guid: 4f60822af0c06433c9c52cd9de5ecb11, type: 3}
       propertyPath: m_Name
-      value: UnityServices
+      value: UnityServicesWithName
       objectReference: {fileID: 0}
     - target: {fileID: 5348375844202089011, guid: 4f60822af0c06433c9c52cd9de5ecb11, type: 3}
       propertyPath: GenerateName
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5348375844202089011, guid: 4f60822af0c06433c9c52cd9de5ecb11, type: 3}
+      propertyPath: FetchPlayerInfo
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5348375844202089011, guid: 4f60822af0c06433c9c52cd9de5ecb11, type: 3}
