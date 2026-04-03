@@ -166,7 +166,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6439263549189241684}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -1}
   m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -175,7 +175,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0.01, y: 1.21}
+  m_AnchoredPosition: {x: 0, y: 0.1}
   m_SizeDelta: {x: 825, y: 613}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &1520215771610131676
@@ -259,6 +259,7 @@ GameObject:
   - component: {fileID: 7433217345291240851}
   - component: {fileID: 7665609306545398925}
   - component: {fileID: 4353411188999279036}
+  - component: {fileID: 635635303969830240}
   m_Layer: 0
   m_Name: capsuleNetworkedPlayer
   m_TagString: Untagged
@@ -472,3 +473,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerNameDisplay
   ShowTopMostFoldoutHeaderGroup: 1
   playerNameText: {fileID: 3778911326362190194}
+--- !u!114 &635635303969830240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8976255040202334801}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba0fc2d888cd8074e931f566e3a6911e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HideMenuOnSpawn
+  ShowTopMostFoldoutHeaderGroup: 1
+  hideDelay: 5
+  menuDocument: {fileID: 0}
