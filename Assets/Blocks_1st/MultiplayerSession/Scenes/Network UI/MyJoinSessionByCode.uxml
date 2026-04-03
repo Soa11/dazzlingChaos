@@ -1,0 +1,25 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="MyCurrentSession" src="project://database/Assets/Blocks_1st/MultiplayerSession/Scenes/Network%20UI/MyCurrentSession.uxml?fileID=9197481963319205126&amp;guid=3d1c08cb02182f2488bb66f2bc00775d&amp;type=3#MyCurrentSession"/>
+    <engine:VisualElement data-source="project://database/Assets/Blocks_1st/MultiplayerSession/Settings/SessionSettings.asset?fileID=11400000&amp;guid=0bf4e1684added44da254017c7fc41b2&amp;type=2#SessionSettings" class="blocks-modal">
+        <engine:Label text="JOIN SESSION BY CODE" class="blocks-header blocks-header--space-bottom blocks-header--sm"/>
+        <engine:VisualElement name="PlayerNameInput" class="blocks-container--horizontal blocks-element--space-bottom" style="flex-grow: 1; width: auto; justify-content: flex-end; align-items: auto; align-self: flex-start;">
+            <engine:TextField label="Player Name" placeholder-text="Type Your Name" name="PlayerNameInput" class="blocks-textfield blocks-element--space-right" style="flex-direction: row-reverse;"/>
+        </engine:VisualElement>
+        <Blocks.Sessions.CreateSessionElement name="CreateSessionElement" class="blocks-element--space-bottom">
+            <Bindings>
+                <engine:DataBinding property="SessionSettings" binding-mode="ToTarget" data-source-path=""/>
+            </Bindings>
+        </Blocks.Sessions.CreateSessionElement>
+        <Blocks.Sessions.Common.CopySessionCodeElement class="blocks-element--space-bottom">
+            <Bindings>
+                <engine:DataBinding property="SessionType" data-source-path="sessionType" binding-mode="ToTarget"/>
+            </Bindings>
+        </Blocks.Sessions.Common.CopySessionCodeElement>
+        <Blocks.Sessions.JoinSessionByCode name="JoinSessionByCode" class="blocks-element--space-bottom">
+            <Bindings>
+                <engine:DataBinding property="SessionSettings" binding-mode="ToTarget" data-source-path=""/>
+            </Bindings>
+        </Blocks.Sessions.JoinSessionByCode>
+    </engine:VisualElement>
+    <engine:Instance template="MyCurrentSession" data-source="project://database/Assets/Blocks_1st/MultiplayerSession/Settings/SessionSettings.asset?fileID=11400000&amp;guid=0bf4e1684added44da254017c7fc41b2&amp;type=2#SessionSettings"/>
+</engine:UXML>
