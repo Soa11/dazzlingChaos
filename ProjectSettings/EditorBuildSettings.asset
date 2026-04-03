@@ -6,16 +6,16 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
-    path: Assets/Blocks_1st/MultiplayerSession/Scenes/capsuleTest.unity
+    path: Assets/MazeNetwork/MergeMaze/Scene/capsuleTest.unity
     guid: 95e8e526db7efc24babe40837d62882c
   - enabled: 0
     path: Assets/StarterAssets/ThirdPersonController/Scenes/Playground_NetworkTest.unity
     guid: 82d5066e823700247b76893ab5beb223
   - enabled: 1
-    path: Assets/Blocks_1st/MultiplayerSession/Scenes/NETWORKED_Android.unity
+    path: Assets/MazeNetwork/MergeMaze/Scene/NETWORKED_Android.unity
     guid: 0489f573988142d4f8011b58268c5dab
   - enabled: 1
-    path: Assets/Blocks_1st/MultiplayerSession/Scenes/UI.unity
+    path: Assets/MazeNetwork/MergeMaze/Scene/UI.unity
     guid: 58a153863699d4d4a83575122958725f
   - enabled: 1
     path: Assets/NetworkBuild/MultiplayerSession/Scenes/UI.unity
