@@ -41,7 +41,7 @@ public class NetworkMobilePlayerController : NetworkBehaviour
 
     [Header("Random spawn")]
     public bool useRandomSpawnPoint = true;
-    public List<Transform> spawnPoints = new List<Transform>();
+    public string spawnRootName = "SpawnPoint";
 
     [Header("Mobile Tilt Settings")]
     public bool useTiltInput = true;
@@ -64,6 +64,7 @@ public class NetworkMobilePlayerController : NetworkBehaviour
     private bool intersectionTiltUsed = false;
 
     private bool initialized = false;
+    private bool spawnApplied = false;
 
     private bool IsMovementPaused => Time.time < intersectionMoveResumeTime;
 
@@ -100,8 +101,74 @@ public class NetworkMobilePlayerController : NetworkBehaviour
         if (useGyro && SystemInfo.supportsGyroscope)
             Input.gyro.enabled = true;
 
-        InitializeOwnerPlayerPosition();
+        if (IsServer)
+        {
+            Vector3 chosenSpawn = GetServerChosenSpawnPosition();
+            ApplySpawnAndLockToRail(chosenSpawn);
+            SendSpawnToOwnerClientRpc(chosenSpawn, OwnerClientId);
+        }
+
         initialized = true;
+    }
+
+    [ClientRpc]
+    private void SendSpawnToOwnerClientRpc(Vector3 spawnPosition, ulong targetClientId)
+    {
+        if (!IsOwner)
+            return;
+
+        if (NetworkManager.Singleton.LocalClientId != targetClientId)
+            return;
+
+        if (IsServer)
+            return; // host already applied directly
+
+        ApplySpawnAndLockToRail(spawnPosition);
+    }
+
+    private Vector3 GetServerChosenSpawnPosition()
+    {
+        Vector3 fallback = transform.position;
+
+        if (!useRandomSpawnPoint)
+            return fallback;
+
+        List<Transform> points = FindSceneSpawnPoints();
+
+        if (points.Count == 0)
+        {
+            Debug.LogWarning("[NetworkMobilePlayerController] No spawn points found under SpawnPoint root.");
+            return fallback;
+        }
+
+        int index = UnityEngine.Random.Range(0, points.Count);
+        Transform chosen = points[index];
+
+        if (chosen == null)
+            return fallback;
+
+        Debug.Log($"[NetworkMobilePlayerController] Server chose spawn point: {chosen.name}");
+        return chosen.position;
+    }
+
+    private List<Transform> FindSceneSpawnPoints()
+    {
+        List<Transform> result = new List<Transform>();
+
+        GameObject root = GameObject.Find(spawnRootName);
+        if (root == null)
+        {
+            Debug.LogWarning($"[NetworkMobilePlayerController] Could not find spawn root named '{spawnRootName}'.");
+            return result;
+        }
+
+        foreach (Transform child in root.transform)
+        {
+            if (child != null)
+                result.Add(child);
+        }
+
+        return result;
     }
 
     private void AutoAssignRailsFromPath()
@@ -136,7 +203,6 @@ public class NetworkMobilePlayerController : NetworkBehaviour
             return;
         }
 
-        // Sort by name so L01, L02, L03... stay in a predictable order.
         List<SplineContainer> sorted = new List<SplineContainer>(splineContainers);
         sorted.Sort((a, b) => string.Compare(a.name, b.name, System.StringComparison.Ordinal));
 
@@ -158,21 +224,17 @@ public class NetworkMobilePlayerController : NetworkBehaviour
         Debug.Log($"[NetworkMobilePlayerController] Auto-assigned {rails.Count} rails from '{pathRootName}'.");
     }
 
-    private void InitializeOwnerPlayerPosition()
+    private void ApplySpawnAndLockToRail(Vector3 spawnWorldPosition)
     {
-        if (useRandomSpawnPoint && spawnPoints.Count > 0)
-        {
-            int spawnIndex = UnityEngine.Random.Range(0, spawnPoints.Count);
-            Transform sp = spawnPoints[spawnIndex];
+        if (spawnApplied)
+            return;
 
-            if (sp != null)
-            {
-                transform.position = sp.position;
-                rb.position = sp.position;
-            }
-        }
+        transform.position = spawnWorldPosition;
+        rb.position = spawnWorldPosition;
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
 
-        if (TryFindNearestRail(transform.position, out int idx, out float tNearest))
+        if (TryFindNearestRail(spawnWorldPosition, out int idx, out float tNearest))
         {
             CurrentRailIndex = idx;
             T = Mathf.Clamp01(tNearest);
@@ -194,6 +256,9 @@ public class NetworkMobilePlayerController : NetworkBehaviour
             rb.angularVelocity = Vector3.zero;
             transform.rotation = Quaternion.LookRotation(tan, Vector3.up);
             IsLocked = true;
+            spawnApplied = true;
+
+            Debug.Log($"[NetworkMobilePlayerController] Applied spawn at rail {CurrentRailIndex}, T={T}");
         }
         else
         {
@@ -203,7 +268,7 @@ public class NetworkMobilePlayerController : NetworkBehaviour
 
     void Update()
     {
-        if (!IsOwner || !IsSpawned || !initialized)
+        if (!IsOwner || !IsSpawned || !initialized || !spawnApplied)
             return;
 
         if (!insideIntersection || currentIntersection == null)
@@ -235,7 +300,7 @@ public class NetworkMobilePlayerController : NetworkBehaviour
 
     void FixedUpdate()
     {
-        if (!IsOwner || !IsSpawned || !initialized)
+        if (!IsOwner || !IsSpawned || !initialized || !spawnApplied)
             return;
 
         if (IsLocked)

@@ -582,6 +582,7 @@ MonoBehaviour:
   m_Script: {fileID: 1909489390}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &231612070
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -48982,6 +48983,7 @@ MonoBehaviour:
   m_Script: {fileID: 1012161356}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &306000071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -97668,6 +97670,7 @@ MonoBehaviour:
   m_Script: {fileID: 1909489390}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &425046045
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146105,7 +146108,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 611703610}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!20 &611703612
 Camera:
   m_ObjectHideFlags: 0
@@ -146950,6 +146953,7 @@ MonoBehaviour:
   m_Script: {fileID: 1295221894}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &768893763
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195555,6 +195559,7 @@ MonoBehaviour:
   m_Script: {fileID: 1909489390}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &863149079
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244174,6 +244179,7 @@ MonoBehaviour:
   m_Script: {fileID: 1909489390}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &997896912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -292497,6 +292503,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1043026310}
+  - component: {fileID: 1043026311}
   m_Layer: 0
   m_Name: Spawn Point
   m_TagString: Untagged
@@ -292526,6 +292533,18 @@ Transform:
   - {fileID: 148270775}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1043026311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1043026309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3017e32e734077f40aba820568dd1c46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnPointRegistry
 --- !u!1 &1142203112
 GameObject:
   m_ObjectHideFlags: 0
