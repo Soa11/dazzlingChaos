@@ -39,9 +39,6 @@ public class NetworkMobilePlayerController : NetworkBehaviour
     [Header("Intersection stop")]
     public float intersectionStopDuration = 2f;
 
-    [Header("Random spawn")]
-    public bool useRandomSpawnPoint = true;
-
     [Header("Mobile Tilt Settings")]
     public bool useTiltInput = true;
     public bool useGyro = false;
@@ -63,7 +60,6 @@ public class NetworkMobilePlayerController : NetworkBehaviour
     private bool intersectionTiltUsed = false;
 
     private bool initialized = false;
-    private bool spawnApplied = false;
 
     private bool IsMovementPaused => Time.time < intersectionMoveResumeTime;
 
@@ -100,50 +96,7 @@ public class NetworkMobilePlayerController : NetworkBehaviour
         if (useGyro && SystemInfo.supportsGyroscope)
             Input.gyro.enabled = true;
 
-        if (IsServer)
-        {
-            Vector3 chosenSpawn = GetServerChosenSpawnPosition();
-            ApplySpawnAndLockToRail(chosenSpawn);
-            SendSpawnToOwnerClientRpc(chosenSpawn, OwnerClientId);
-        }
-
         initialized = true;
-    }
-
-    [ClientRpc]
-    private void SendSpawnToOwnerClientRpc(Vector3 spawnPosition, ulong targetClientId)
-    {
-        Debug.Log($"[NetworkMobilePlayerController][RPC RECEIVED][Owner:{OwnerClientId}][Local:{NetworkManager.Singleton.LocalClientId}] targetClientId={targetClientId}, spawnPosition={spawnPosition}");
-
-        if (!IsOwner)
-            return;
-
-        if (NetworkManager.Singleton.LocalClientId != targetClientId)
-            return;
-
-        if (IsServer)
-            return; // host already applied directly
-
-        ApplySpawnAndLockToRail(spawnPosition);
-    }
-
-    private Vector3 GetServerChosenSpawnPosition()
-    {
-        Vector3 fallback = transform.position;
-
-        if (!useRandomSpawnPoint)
-            return fallback;
-
-        Transform chosen = SpawnPointRegistry.GetRandomSpawnPoint();
-
-        if (chosen == null)
-        {
-            Debug.LogWarning("[NetworkMobilePlayerController] SpawnPointRegistry returned no spawn point.");
-            return fallback;
-        }
-
-        Debug.Log($"[NetworkMobilePlayerController] Server chose spawn point from registry: {chosen.name} at {chosen.position}");
-        return chosen.position;
     }
 
     private void AutoAssignRailsFromPath()
@@ -199,10 +152,10 @@ public class NetworkMobilePlayerController : NetworkBehaviour
         Debug.Log($"[NetworkMobilePlayerController] Auto-assigned {rails.Count} rails from '{pathRootName}'.");
     }
 
-    private void ApplySpawnAndLockToRail(Vector3 spawnWorldPosition)
+    public void SetSpawnOnNearestRail(Vector3 spawnWorldPosition)
     {
-        if (spawnApplied)
-            return;
+        if (rb == null)
+            rb = GetComponent<Rigidbody>();
 
         transform.position = spawnWorldPosition;
         rb.position = spawnWorldPosition;
@@ -231,11 +184,8 @@ public class NetworkMobilePlayerController : NetworkBehaviour
             rb.angularVelocity = Vector3.zero;
             transform.rotation = Quaternion.LookRotation(tan, Vector3.up);
             IsLocked = true;
-            spawnApplied = true;
 
-            Debug.Log($"[NetworkMobilePlayerController][Owner:{OwnerClientId}][Local:{NetworkManager.Singleton.LocalClientId}] Spawn input: {spawnWorldPosition}");
-            Debug.Log($"[NetworkMobilePlayerController][Owner:{OwnerClientId}][Local:{NetworkManager.Singleton.LocalClientId}] Nearest rail index: {CurrentRailIndex}, T: {T}");
-            Debug.Log($"[NetworkMobilePlayerController][Owner:{OwnerClientId}][Local:{NetworkManager.Singleton.LocalClientId}] Final snapped position: {pos}");
+            Debug.Log($"[NetworkMobilePlayerController] Set spawn at rail {CurrentRailIndex}, T={T}");
         }
         else
         {
@@ -245,7 +195,7 @@ public class NetworkMobilePlayerController : NetworkBehaviour
 
     void Update()
     {
-        if (!IsOwner || !IsSpawned || !initialized || !spawnApplied)
+        if (!IsOwner || !IsSpawned || !initialized)
             return;
 
         if (!insideIntersection || currentIntersection == null)
@@ -277,7 +227,7 @@ public class NetworkMobilePlayerController : NetworkBehaviour
 
     void FixedUpdate()
     {
-        if (!IsOwner || !IsSpawned || !initialized || !spawnApplied)
+        if (!IsOwner || !IsSpawned || !initialized)
             return;
 
         if (IsLocked)
