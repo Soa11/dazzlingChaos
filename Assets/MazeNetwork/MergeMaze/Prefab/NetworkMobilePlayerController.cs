@@ -41,7 +41,6 @@ public class NetworkMobilePlayerController : NetworkBehaviour
 
     [Header("Random spawn")]
     public bool useRandomSpawnPoint = true;
-    public string spawnRootName = "SpawnPoint";
 
     [Header("Mobile Tilt Settings")]
     public bool useTiltInput = true;
@@ -114,6 +113,8 @@ public class NetworkMobilePlayerController : NetworkBehaviour
     [ClientRpc]
     private void SendSpawnToOwnerClientRpc(Vector3 spawnPosition, ulong targetClientId)
     {
+        Debug.Log($"[NetworkMobilePlayerController][RPC RECEIVED][Owner:{OwnerClientId}][Local:{NetworkManager.Singleton.LocalClientId}] targetClientId={targetClientId}, spawnPosition={spawnPosition}");
+
         if (!IsOwner)
             return;
 
@@ -133,42 +134,16 @@ public class NetworkMobilePlayerController : NetworkBehaviour
         if (!useRandomSpawnPoint)
             return fallback;
 
-        List<Transform> points = FindSceneSpawnPoints();
-
-        if (points.Count == 0)
-        {
-            Debug.LogWarning("[NetworkMobilePlayerController] No spawn points found under SpawnPoint root.");
-            return fallback;
-        }
-
-        int index = UnityEngine.Random.Range(0, points.Count);
-        Transform chosen = points[index];
+        Transform chosen = SpawnPointRegistry.GetRandomSpawnPoint();
 
         if (chosen == null)
+        {
+            Debug.LogWarning("[NetworkMobilePlayerController] SpawnPointRegistry returned no spawn point.");
             return fallback;
+        }
 
-        Debug.Log($"[NetworkMobilePlayerController] Server chose spawn point: {chosen.name}");
+        Debug.Log($"[NetworkMobilePlayerController] Server chose spawn point from registry: {chosen.name} at {chosen.position}");
         return chosen.position;
-    }
-
-    private List<Transform> FindSceneSpawnPoints()
-    {
-        List<Transform> result = new List<Transform>();
-
-        GameObject root = GameObject.Find(spawnRootName);
-        if (root == null)
-        {
-            Debug.LogWarning($"[NetworkMobilePlayerController] Could not find spawn root named '{spawnRootName}'.");
-            return result;
-        }
-
-        foreach (Transform child in root.transform)
-        {
-            if (child != null)
-                result.Add(child);
-        }
-
-        return result;
     }
 
     private void AutoAssignRailsFromPath()
@@ -258,7 +233,9 @@ public class NetworkMobilePlayerController : NetworkBehaviour
             IsLocked = true;
             spawnApplied = true;
 
-            Debug.Log($"[NetworkMobilePlayerController] Applied spawn at rail {CurrentRailIndex}, T={T}");
+            Debug.Log($"[NetworkMobilePlayerController][Owner:{OwnerClientId}][Local:{NetworkManager.Singleton.LocalClientId}] Spawn input: {spawnWorldPosition}");
+            Debug.Log($"[NetworkMobilePlayerController][Owner:{OwnerClientId}][Local:{NetworkManager.Singleton.LocalClientId}] Nearest rail index: {CurrentRailIndex}, T: {T}");
+            Debug.Log($"[NetworkMobilePlayerController][Owner:{OwnerClientId}][Local:{NetworkManager.Singleton.LocalClientId}] Final snapped position: {pos}");
         }
         else
         {
