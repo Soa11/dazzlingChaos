@@ -467,7 +467,6 @@ GameObject:
   m_Component:
   - component: {fileID: 231612071}
   - component: {fileID: 231612070}
-  - component: {fileID: 231612069}
   - component: {fileID: 231612068}
   - component: {fileID: 231612067}
   - component: {fileID: 231612066}
@@ -570,19 +569,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 231612065}
   m_Mesh: {fileID: 0}
---- !u!114 &231612069
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 231612065}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1909489390}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
-  SegmentNames: []
 --- !u!114 &231612070
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -48868,7 +48854,6 @@ GameObject:
   m_Component:
   - component: {fileID: 306000072}
   - component: {fileID: 306000071}
-  - component: {fileID: 306000070}
   - component: {fileID: 306000069}
   - component: {fileID: 306000068}
   - component: {fileID: 306000067}
@@ -48971,19 +48956,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 306000066}
   m_Mesh: {fileID: 0}
---- !u!114 &306000070
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 306000066}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1012161356}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
-  SegmentNames: []
 --- !u!114 &306000071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -97555,7 +97527,6 @@ GameObject:
   m_Component:
   - component: {fileID: 425046046}
   - component: {fileID: 425046045}
-  - component: {fileID: 425046044}
   - component: {fileID: 425046043}
   - component: {fileID: 425046042}
   - component: {fileID: 425046041}
@@ -97658,19 +97629,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 425046040}
   m_Mesh: {fileID: 0}
---- !u!114 &425046044
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 425046040}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1909489390}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
-  SegmentNames: []
 --- !u!114 &425046045
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146838,7 +146796,6 @@ GameObject:
   m_Component:
   - component: {fileID: 768893764}
   - component: {fileID: 768893763}
-  - component: {fileID: 768893762}
   - component: {fileID: 768893761}
   - component: {fileID: 768893760}
   - component: {fileID: 768893759}
@@ -146941,19 +146898,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 768893758}
   m_Mesh: {fileID: 0}
---- !u!114 &768893762
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 768893758}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1295221894}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
-  SegmentNames: []
 --- !u!114 &768893763
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195444,7 +195388,6 @@ GameObject:
   m_Component:
   - component: {fileID: 863149080}
   - component: {fileID: 863149079}
-  - component: {fileID: 863149078}
   - component: {fileID: 863149077}
   - component: {fileID: 863149076}
   - component: {fileID: 863149075}
@@ -195547,19 +195490,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 863149074}
   m_Mesh: {fileID: 0}
---- !u!114 &863149078
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 863149074}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1909489390}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
-  SegmentNames: []
 --- !u!114 &863149079
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244064,7 +243994,6 @@ GameObject:
   m_Component:
   - component: {fileID: 997896913}
   - component: {fileID: 997896912}
-  - component: {fileID: 997896911}
   - component: {fileID: 997896910}
   - component: {fileID: 997896909}
   - component: {fileID: 997896908}
@@ -244167,19 +244096,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 997896907}
   m_Mesh: {fileID: 0}
---- !u!114 &997896911
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 997896907}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1909489390}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
-  SegmentNames: []
 --- !u!114 &997896912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -292367,21 +292283,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 906286511}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!115 &1012161356
-MonoScript:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  serializedVersion: 7
-  m_DefaultReferences: {}
-  m_Icon: {fileID: 0}
-  m_Type: 0
-  m_ExecutionOrder: 0
-  m_ClassName: SplineInfo
-  m_Namespace: 
-  m_AssemblyName: Assembly-CSharp-Editor
 --- !u!1 &1027671798
 GameObject:
   m_ObjectHideFlags: 0
@@ -292940,21 +292841,6 @@ MonoBehaviour:
   splineIndexA: 0
   railB: {fileID: 1951063891}
   splineIndexB: 0
---- !u!115 &1295221894
-MonoScript:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  serializedVersion: 7
-  m_DefaultReferences: {}
-  m_Icon: {fileID: 0}
-  m_Type: 0
-  m_ExecutionOrder: 0
-  m_ClassName: SplineInfo
-  m_Namespace: 
-  m_AssemblyName: Assembly-CSharp-Editor
 --- !u!1 &1322116736
 GameObject:
   m_ObjectHideFlags: 0
@@ -294542,21 +294428,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1043026310}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!115 &1909489390
-MonoScript:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  serializedVersion: 7
-  m_DefaultReferences: {}
-  m_Icon: {fileID: 0}
-  m_Type: 0
-  m_ExecutionOrder: 0
-  m_ClassName: SplineInfo
-  m_Namespace: 
-  m_AssemblyName: Assembly-CSharp-Editor
 --- !u!1 &1951063886
 GameObject:
   m_ObjectHideFlags: 0
@@ -294567,7 +294438,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1951063892}
   - component: {fileID: 1951063891}
-  - component: {fileID: 1951063890}
   - component: {fileID: 1951063889}
   - component: {fileID: 1951063888}
   - component: {fileID: 1951063887}
@@ -294670,20 +294540,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1951063886}
   m_Mesh: {fileID: 0}
---- !u!114 &1951063890
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1951063886}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1909489390}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
-  SegmentNames:
-  - L06rebuiltCurve1
 --- !u!114 &1951063891
 MonoBehaviour:
   m_ObjectHideFlags: 0
