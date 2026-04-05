@@ -17,7 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/MazeNetwork/MergeMaze/Scene/UI.unity
     guid: 58a153863699d4d4a83575122958725f
-  - enabled: 1
+  - enabled: 0
     path: Assets/NetworkBuild/MultiplayerSession/Scenes/UI.unity
     guid: 755e3d8ea3373e549b58bc4490d165bc
   - enabled: 1
