@@ -17,6 +17,9 @@ public class NetworkPlayerSpawn : NetworkBehaviour
     // Static persists across all instances of this script on the Server
     private static int _nextSpawnIndex = 0;
 
+    // NEW: persistent key
+    private const string SpawnIndexKey = "NetworkPlayerSpawn_NextIndex";
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -30,13 +33,15 @@ public class NetworkPlayerSpawn : NetworkBehaviour
         // Only the Server/Host decides where a player starts
         if (IsServer)
         {
+            // NEW: load saved index (persist across play sessions)
+            _nextSpawnIndex = PlayerPrefs.GetInt(SpawnIndexKey, 0);
+
             Vector3 chosenSpawn = GetServerChosenSpawnPosition();
 
             // 1. Position the server's version of this player
             ApplySpawn(chosenSpawn);
 
             // 2. Tell the client who owns this object to move to this specific coordinate
-            // We pass the ClientId to ensure we're talking to the right person
             SyncSpawnClientRpc(chosenSpawn, OwnerClientId);
         }
     }
@@ -44,10 +49,8 @@ public class NetworkPlayerSpawn : NetworkBehaviour
     [ClientRpc]
     private void SyncSpawnClientRpc(Vector3 spawnPosition, ulong targetClientId)
     {
-        // If we are the server, we already did this in OnNetworkSpawn
         if (IsServer) return;
 
-        // Ensure only the owner of THIS player object moves themselves
         if (NetworkManager.Singleton.LocalClientId == targetClientId)
         {
             Debug.Log($"[NetworkPlayerSpawn] Client received spawn position: {spawnPosition}");
@@ -57,10 +60,8 @@ public class NetworkPlayerSpawn : NetworkBehaviour
 
     private void ApplySpawn(Vector3 spawnWorldPosition)
     {
-        // Move the transform
         transform.position = spawnWorldPosition;
 
-        // Move the physics body
         if (rb != null)
         {
             rb.position = spawnWorldPosition;
@@ -68,7 +69,6 @@ public class NetworkPlayerSpawn : NetworkBehaviour
             rb.angularVelocity = Vector3.zero;
         }
 
-        // Snap to the nearest rail immediately so the player is "locked"
         if (playerController != null)
         {
             playerController.SetSpawnOnNearestRail(spawnWorldPosition);
@@ -95,11 +95,15 @@ public class NetworkPlayerSpawn : NetworkBehaviour
         if (points.Count == 0) return transform.position;
 
         int index;
+
         if (useRoundRobin)
         {
-            // Use the static counter to ensure Player 1 gets index 0, Player 2 gets index 1, etc.
             index = _nextSpawnIndex % points.Count;
             _nextSpawnIndex++;
+
+            // NEW: save index for next session
+            PlayerPrefs.SetInt(SpawnIndexKey, _nextSpawnIndex);
+            PlayerPrefs.Save();
         }
         else
         {
@@ -108,6 +112,7 @@ public class NetworkPlayerSpawn : NetworkBehaviour
 
         Transform chosen = points[index];
         Debug.Log($"[NetworkPlayerSpawn] Server assigned index {index} ({chosen.name}) to Player {OwnerClientId}");
+
         return chosen.position;
     }
 }
