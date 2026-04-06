@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Splines;
 using Unity.Mathematics;
@@ -19,13 +19,13 @@ public class NetworkMobilePlayerController : NetworkBehaviour
     public string pathRootName = "PATH";
     public bool autoFindRailsFromPath = true;
 
-    [Header("Rails (L01�L07)")]
+    [Header("Rails (L01–L07)")]
     public List<RailRef> rails = new List<RailRef>();
 
     [Header("Movement along rail")]
     public float maxSpeed = 12f;
     public float accel = 12f;
-    public float inputDeadzone = 0.05f;
+    public float inputDeadzone = 0.08f;
 
     [Header("Rail spring forces")]
     public float posSpring = 80f;
@@ -36,15 +36,18 @@ public class NetworkMobilePlayerController : NetworkBehaviour
     [Header("Offsets")]
     public Vector3 playerOffset = Vector3.zero;
 
-    [Header("Intersection stop")]
-    public float intersectionStopDuration = 2f;
+    [Header("Phone Angle Control")]
+    [Tooltip("90 = stop. Less than 90 = forward. Greater than 90 = backward.")]
+    public float neutralAngle = 90f;
 
-    [Header("Mobile Tilt Settings")]
-    public bool useTiltInput = true;
-    public bool useGyro = false;
-    public float tiltDeadZone = 0.05f;
-    public float maxTilt = 0.4f;
-    public float intersectionTiltThreshold = 0.25f;
+    [Tooltip("How far from neutral before full input is reached.")]
+    public float angleRange = 45f;
+
+    [Tooltip("Smooths the tilt input.")]
+    public float inputSmoothing = 6f;
+
+    [Tooltip("Invert if your device direction feels opposite.")]
+    public bool invertForwardBackward = false;
 
     private Rigidbody rb;
 
@@ -53,15 +56,15 @@ public class NetworkMobilePlayerController : NetworkBehaviour
     public bool IsLocked { get; private set; } = true;
 
     private float vAlong = 0f;
-
-    private IntersectionNode currentIntersection;
-    private bool insideIntersection = false;
-    private float intersectionMoveResumeTime = 0f;
-    private bool intersectionTiltUsed = false;
-
     private bool initialized = false;
+    private float smoothedForwardInput = 0f;
 
-    private bool IsMovementPaused => Time.time < intersectionMoveResumeTime;
+    // private IntersectionNode currentIntersection;
+    // private bool insideIntersection = false;
+    // private float intersectionMoveResumeTime = 0f;
+    // private bool intersectionTiltUsed = false;
+
+    // private bool IsMovementPaused => Time.time < intersectionMoveResumeTime;
 
     void Awake()
     {
@@ -92,9 +95,6 @@ public class NetworkMobilePlayerController : NetworkBehaviour
             enabled = false;
             return;
         }
-
-        if (useGyro && SystemInfo.supportsGyroscope)
-            Input.gyro.enabled = true;
 
         initialized = true;
     }
@@ -198,31 +198,7 @@ public class NetworkMobilePlayerController : NetworkBehaviour
         if (!IsOwner || !IsSpawned || !initialized)
             return;
 
-        if (!insideIntersection || currentIntersection == null)
-            return;
-
-#if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            SwitchAtIntersection(currentIntersection);
-        }
-#endif
-
-#if !UNITY_EDITOR
-        if (useTiltInput)
-        {
-            float turnInput = GetTurnInput();
-
-            if (!intersectionTiltUsed && turnInput <= -intersectionTiltThreshold)
-            {
-                SwitchAtIntersection(currentIntersection);
-                intersectionTiltUsed = true;
-            }
-
-            if (Mathf.Abs(turnInput) < tiltDeadZone)
-                intersectionTiltUsed = false;
-        }
-#endif
+        // Intersection logic temporarily disabled.
     }
 
     void FixedUpdate()
@@ -244,12 +220,9 @@ public class NetworkMobilePlayerController : NetworkBehaviour
         var wM = rr.container.transform.localToWorldMatrix;
 
         float input = GetForwardInput();
-        float targetSpeed = IsMovementPaused ? 0f : input * maxSpeed;
+        float targetSpeed = input * maxSpeed;
 
-        if (IsMovementPaused)
-            vAlong = 0f;
-        else
-            vAlong = Mathf.MoveTowards(vAlong, targetSpeed, accel * Time.fixedDeltaTime);
+        vAlong = Mathf.MoveTowards(vAlong, targetSpeed, accel * Time.fixedDeltaTime);
 
         float length = Mathf.Max(0.001f, SplineUtility.CalculateLength(sp, wM));
         T += (vAlong * Time.fixedDeltaTime) / length;
@@ -286,6 +259,7 @@ public class NetworkMobilePlayerController : NetworkBehaviour
         }
     }
 
+    /*
     void OnTriggerEnter(Collider other)
     {
         if (!IsOwner || !IsSpawned)
@@ -363,72 +337,48 @@ public class NetworkMobilePlayerController : NetworkBehaviour
         float speed = Vector3.Dot(rb.linearVelocity, tangent);
         rb.linearVelocity = tangent * speed;
     }
+    */
 
     float GetForwardInput()
     {
 #if UNITY_EDITOR
         float input = Input.GetAxis("Vertical");
-        if (Mathf.Abs(input) < inputDeadzone) input = 0f;
+        if (Mathf.Abs(input) < inputDeadzone)
+            input = 0f;
         return input;
 #else
-        if (!useTiltInput)
-        {
-            float input = Input.GetAxis("Vertical");
-            if (Mathf.Abs(input) < inputDeadzone) input = 0f;
-            return input;
-        }
+        float phoneAngle = GetPhonePitchAngle();
+        float input = (neutralAngle - phoneAngle) / Mathf.Max(1f, angleRange);
 
-        Vector2 tilt = GetTilt();
-        float inputTilt = tilt.y;
+        if (invertForwardBackward)
+            input = -input;
 
-        if (Mathf.Abs(inputTilt) < tiltDeadZone)
-            inputTilt = 0f;
+        input = Mathf.Clamp(input, -1f, 1f);
 
-        if (maxTilt > 0f)
-            inputTilt = Mathf.Clamp(inputTilt / maxTilt, -1f, 1f);
+        if (Mathf.Abs(input) < inputDeadzone)
+            input = 0f;
 
-        return inputTilt;
+        smoothedForwardInput = Mathf.Lerp(
+            smoothedForwardInput,
+            input,
+            inputSmoothing * Time.deltaTime
+        );
+
+        return smoothedForwardInput;
 #endif
     }
 
-    float GetTurnInput()
+    float GetPhonePitchAngle()
     {
-#if UNITY_EDITOR
-        return Input.GetAxis("Horizontal");
-#else
-        if (!useTiltInput)
-            return Input.GetAxis("Horizontal");
+        Vector3 acc = Input.acceleration.normalized;
 
-        Vector2 tilt = GetTilt();
-        float x = tilt.x;
+        // angle from flat-up to flat-down
+        // acc.z ≈ -1 when flat on table face up
+        // acc.z ≈ 0 when near upright
+        // acc.z ≈ +1 when flipped far toward user
+        float angle = Mathf.Acos(Mathf.Clamp(-acc.z, -1f, 1f)) * Mathf.Rad2Deg;
 
-        if (Mathf.Abs(x) < tiltDeadZone)
-            x = 0f;
-
-        if (maxTilt > 0f)
-            x = Mathf.Clamp(x / maxTilt, -1f, 1f);
-
-        return x;
-#endif
-    }
-
-    Vector2 GetTilt()
-    {
-        if (useGyro && SystemInfo.supportsGyroscope)
-        {
-            Quaternion q = Input.gyro.attitude;
-            q = new Quaternion(q.x, q.y, -q.z, -q.w);
-
-            Vector3 euler = q.eulerAngles;
-
-            float tiltForward = Mathf.DeltaAngle(0f, euler.x) / 90f;
-            float tiltSide = Mathf.DeltaAngle(0f, euler.z) / 90f;
-
-            return new Vector2(tiltSide, -tiltForward);
-        }
-
-        Vector3 acc = Input.acceleration;
-        return new Vector2(acc.x, acc.y);
+        return angle;
     }
 
     bool TryFindNearestRail(Vector3 pos, out int bestIdx, out float bestT)
