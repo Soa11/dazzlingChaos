@@ -320,7 +320,10 @@ public class NetworkMobilePlayerController : NetworkBehaviour
         rb.AddForce(springAccel, ForceMode.Acceleration);
 
         float vNow = Vector3.Dot(rb.linearVelocity, tangent);
-        rb.AddForce(tangent * ((vAlong - vNow) / Time.fixedDeltaTime), ForceMode.Acceleration);
+        float velocityLerp = 0.5f; // try 0.3–0.7
+        rb.AddForce(tangent * ((vAlong - vNow) * velocityLerp / Time.fixedDeltaTime), ForceMode.Acceleration);
+
+        //rb.AddForce(tangent * ((vAlong - vNow) / Time.fixedDeltaTime), ForceMode.Acceleration);
 
         Quaternion want = Quaternion.LookRotation(tangent, Vector3.up);
         Quaternion dq = want * Quaternion.Inverse(rb.rotation);
