@@ -577,7 +577,7 @@ MonoBehaviour:
     splineIndex: 0
   - container: {fileID: 0}
     splineIndex: 0
-  maxSpeed: 12
+  maxSpeed: 18
   accel: 12
   inputDeadzone: 0.08
   posSpring: 80
@@ -586,7 +586,7 @@ MonoBehaviour:
   rotDamping: 8
   playerOffset: {x: 0, y: 1.3, z: 0}
   neutralAngle: 90
-  angleRange: 45
+  angleRange: 42
   inputSmoothing: 6
   invertForwardBackward: 0
   autoEnableInput: 1

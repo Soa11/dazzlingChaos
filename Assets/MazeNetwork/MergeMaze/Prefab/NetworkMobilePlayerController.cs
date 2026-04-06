@@ -345,6 +345,8 @@ public class NetworkMobilePlayerController : NetworkBehaviour
 
         if (Mathf.Abs(input) < inputDeadzone)
             input = 0f;
+        else
+            input = Mathf.Sign(input) * input * input;
 
         smoothedForwardInput = Mathf.Lerp(
             smoothedForwardInput,
