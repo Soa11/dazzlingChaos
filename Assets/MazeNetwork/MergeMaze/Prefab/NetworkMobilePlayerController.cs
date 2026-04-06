@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Splines;
 using Unity.Mathematics;
@@ -19,7 +20,7 @@ public class NetworkMobilePlayerController : NetworkBehaviour
     public string pathRootName = "PATH";
     public bool autoFindRailsFromPath = true;
 
-    [Header("Rails (L01–L07)")]
+    [Header("Rails")]
     public List<RailRef> rails = new List<RailRef>();
 
     [Header("Movement along rail")]
@@ -43,28 +44,35 @@ public class NetworkMobilePlayerController : NetworkBehaviour
     [Tooltip("How far from neutral before full input is reached.")]
     public float angleRange = 45f;
 
-    [Tooltip("Smooths the tilt input.")]
+    [Tooltip("Smooths mobile input.")]
     public float inputSmoothing = 6f;
 
-    [Tooltip("Invert if your device direction feels opposite.")]
+    [Tooltip("Tick this if forward/backward feels reversed on device.")]
     public bool invertForwardBackward = false;
 
+    [Header("Input Start")]
+    [Tooltip("If true, owner input starts automatically after delay.")]
+    public bool autoEnableInput = true;
+
+    [Tooltip("Useful if UI stays on screen for a few seconds.")]
+    public float autoEnableDelay = 5f;
+
+    [Tooltip("Read-only at runtime.")]
+    public bool inputEnabled = false;
+
+    [Header("Debug")]
+    [SerializeField] private float debugPhoneAngle = 90f;
+    [SerializeField] private float debugForwardInput = 0f;
+
     private Rigidbody rb;
+    private bool initialized = false;
+    private float vAlong = 0f;
+    private float smoothedForwardInput = 0f;
+    private Coroutine autoEnableRoutine;
 
     public int CurrentRailIndex { get; private set; } = 0;
     public float T { get; private set; } = 0f;
     public bool IsLocked { get; private set; } = true;
-
-    private float vAlong = 0f;
-    private bool initialized = false;
-    private float smoothedForwardInput = 0f;
-
-    // private IntersectionNode currentIntersection;
-    // private bool insideIntersection = false;
-    // private float intersectionMoveResumeTime = 0f;
-    // private bool intersectionTiltUsed = false;
-
-    // private bool IsMovementPaused => Time.time < intersectionMoveResumeTime;
 
     void Awake()
     {
@@ -96,7 +104,54 @@ public class NetworkMobilePlayerController : NetworkBehaviour
             return;
         }
 
+        inputEnabled = false;
+        smoothedForwardInput = 0f;
+        vAlong = 0f;
         initialized = true;
+
+        if (autoEnableInput)
+        {
+            if (autoEnableRoutine != null)
+                StopCoroutine(autoEnableRoutine);
+
+            autoEnableRoutine = StartCoroutine(AutoEnableInputAfterDelay());
+        }
+    }
+
+    IEnumerator AutoEnableInputAfterDelay()
+    {
+        yield return new WaitForSeconds(autoEnableDelay);
+        EnableInput();
+    }
+
+    public void EnableInput()
+    {
+        if (!IsOwner)
+            return;
+
+        inputEnabled = true;
+        smoothedForwardInput = 0f;
+        vAlong = 0f;
+
+        Debug.Log("[NetworkMobilePlayerController] Input ENABLED");
+    }
+
+    public void DisableInput()
+    {
+        if (!IsOwner)
+            return;
+
+        inputEnabled = false;
+        smoothedForwardInput = 0f;
+        vAlong = 0f;
+
+        if (rb != null && !rb.isKinematic)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        Debug.Log("[NetworkMobilePlayerController] Input DISABLED");
     }
 
     private void AutoAssignRailsFromPath()
@@ -136,11 +191,8 @@ public class NetworkMobilePlayerController : NetworkBehaviour
 
         foreach (SplineContainer sc in sorted)
         {
-            if (sc == null)
-                continue;
-
-            if (sc.Splines == null || sc.Splines.Count == 0)
-                continue;
+            if (sc == null) continue;
+            if (sc.Splines == null || sc.Splines.Count == 0) continue;
 
             rails.Add(new RailRef
             {
@@ -159,8 +211,12 @@ public class NetworkMobilePlayerController : NetworkBehaviour
 
         transform.position = spawnWorldPosition;
         rb.position = spawnWorldPosition;
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
+
+        if (!rb.isKinematic)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
 
         if (TryFindNearestRail(spawnWorldPosition, out int idx, out float tNearest))
         {
@@ -180,8 +236,13 @@ public class NetworkMobilePlayerController : NetworkBehaviour
 
             transform.position = pos;
             rb.position = pos;
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
+
+            if (!rb.isKinematic)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+
             transform.rotation = Quaternion.LookRotation(tan, Vector3.up);
             IsLocked = true;
 
@@ -198,7 +259,10 @@ public class NetworkMobilePlayerController : NetworkBehaviour
         if (!IsOwner || !IsSpawned || !initialized)
             return;
 
-        // Intersection logic temporarily disabled.
+#if !UNITY_EDITOR
+        debugPhoneAngle = GetPhonePitchAngle();
+        debugForwardInput = GetForwardInput();
+#endif
     }
 
     void FixedUpdate()
@@ -251,96 +315,19 @@ public class NetworkMobilePlayerController : NetworkBehaviour
 
         if (Mathf.Abs(ang) > 0.001f)
         {
-            Vector3 torque = axis.normalized *
-                             (rotTorque * Mathf.Deg2Rad * ang)
-                             - rotDamping * rb.angularVelocity;
+            Vector3 torque =
+                axis.normalized * (rotTorque * Mathf.Deg2Rad * ang)
+                - rotDamping * rb.angularVelocity;
 
             rb.AddTorque(torque, ForceMode.Acceleration);
         }
     }
 
-    /*
-    void OnTriggerEnter(Collider other)
-    {
-        if (!IsOwner || !IsSpawned)
-            return;
-
-        var node = other.GetComponent<IntersectionNode>();
-        if (!node) return;
-
-        insideIntersection = true;
-        currentIntersection = node;
-
-        intersectionMoveResumeTime = Time.time + intersectionStopDuration;
-        intersectionTiltUsed = false;
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-        if (!IsOwner || !IsSpawned)
-            return;
-
-        var node = other.GetComponent<IntersectionNode>();
-        if (!node) return;
-
-        if (node == currentIntersection)
-        {
-            insideIntersection = false;
-            currentIntersection = null;
-            intersectionTiltUsed = false;
-        }
-    }
-
-    void SwitchAtIntersection(IntersectionNode node)
-    {
-        var currentRail = rails[CurrentRailIndex].container;
-
-        if (!node.GetOther(currentRail, out var otherContainer, out int otherIndex))
-            return;
-
-        int targetIndex = -1;
-        for (int i = 0; i < rails.Count; i++)
-        {
-            if (rails[i].container == otherContainer &&
-                rails[i].splineIndex == otherIndex)
-            {
-                targetIndex = i;
-                break;
-            }
-        }
-
-        if (targetIndex < 0)
-            return;
-
-        var rr = rails[targetIndex];
-        var sp = rr.container.Splines[rr.splineIndex];
-
-        Vector3 worldPos = transform.position;
-        Vector3 localPos = rr.container.transform.InverseTransformPoint(worldPos);
-
-        float3 nL;
-        float t;
-        SplineUtility.GetNearestPoint(sp, (float3)localPos, out nL, out t);
-
-        T = Mathf.Clamp01(t);
-        CurrentRailIndex = targetIndex;
-
-        Vector3 newWorldPos = rr.container.transform.TransformPoint((Vector3)nL) + playerOffset;
-        Vector3 tangent = rr.container.transform.TransformDirection(
-            (Vector3)SplineUtility.EvaluateTangent(sp, T)
-        ).normalized;
-
-        rb.position = newWorldPos;
-        transform.position = newWorldPos;
-        transform.rotation = Quaternion.LookRotation(tangent, Vector3.up);
-
-        float speed = Vector3.Dot(rb.linearVelocity, tangent);
-        rb.linearVelocity = tangent * speed;
-    }
-    */
-
     float GetForwardInput()
     {
+        if (!inputEnabled)
+            return 0f;
+
 #if UNITY_EDITOR
         float input = Input.GetAxis("Vertical");
         if (Mathf.Abs(input) < inputDeadzone)
@@ -348,6 +335,7 @@ public class NetworkMobilePlayerController : NetworkBehaviour
         return input;
 #else
         float phoneAngle = GetPhonePitchAngle();
+
         float input = (neutralAngle - phoneAngle) / Mathf.Max(1f, angleRange);
 
         if (invertForwardBackward)
@@ -370,13 +358,18 @@ public class NetworkMobilePlayerController : NetworkBehaviour
 
     float GetPhonePitchAngle()
     {
-        Vector3 acc = Input.acceleration.normalized;
+        Vector3 g = Input.acceleration.normalized;
 
-        // angle from flat-up to flat-down
-        // acc.z ≈ -1 when flat on table face up
-        // acc.z ≈ 0 when near upright
-        // acc.z ≈ +1 when flipped far toward user
-        float angle = Mathf.Acos(Mathf.Clamp(-acc.z, -1f, 1f)) * Mathf.Rad2Deg;
+        if (g.sqrMagnitude < 0.0001f)
+            return neutralAngle;
+
+        float angle = Vector3.SignedAngle(Vector3.back, g, Vector3.right);
+
+        if (angle < 0f)
+            angle += 360f;
+
+        if (angle > 180f)
+            angle = 360f - angle;
 
         return angle;
     }
@@ -416,6 +409,7 @@ public class NetworkMobilePlayerController : NetworkBehaviour
     bool ValidateRail(int i)
     {
         if (i < 0 || i >= rails.Count) return false;
+
         var r = rails[i];
         if (!r.container) return false;
 

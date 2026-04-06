@@ -405,7 +405,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1146042533
+  GlobalObjectIdHash: 2131978745
   InScenePlacedSourceGlobalObjectIdHash: 1329766114
   DeferredDespawnTick: 0
   Ownership: 1
@@ -579,18 +579,21 @@ MonoBehaviour:
     splineIndex: 0
   maxSpeed: 12
   accel: 12
-  inputDeadzone: 0.05
+  inputDeadzone: 0.08
   posSpring: 80
   posDamping: 12
   rotTorque: 28
   rotDamping: 8
   playerOffset: {x: 0, y: 1.3, z: 0}
-  intersectionStopDuration: 2
-  useTiltInput: 1
-  useGyro: 0
-  tiltDeadZone: 0.05
-  maxTilt: 0.4
-  intersectionTiltThreshold: 0.25
+  neutralAngle: 90
+  angleRange: 45
+  inputSmoothing: 6
+  invertForwardBackward: 0
+  autoEnableInput: 1
+  autoEnableDelay: 5
+  inputEnabled: 0
+  debugPhoneAngle: 90
+  debugForwardInput: 0
 --- !u!114 &105538998702399004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -619,7 +622,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NetworkPlayerSpawn
   ShowTopMostFoldoutHeaderGroup: 1
   spawnRootName: SpawnPoint
-  useRandomSpawnPoint: 1
+  useRoundRobin: 1
 --- !u!1 &5562377253855626803
 GameObject:
   m_ObjectHideFlags: 0
