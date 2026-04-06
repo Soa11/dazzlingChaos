@@ -24,8 +24,8 @@ public class NetworkMobilePlayerController : NetworkBehaviour
     public List<RailRef> rails = new List<RailRef>();
 
     [Header("Movement along rail")]
-    public float maxSpeed = 12f;
-    public float accel = 12f;
+    public float maxSpeed = 18f;
+    public float accel = 10f;
     public float inputDeadzone = 0.08f;
 
     [Header("Rail spring forces")]
@@ -42,13 +42,18 @@ public class NetworkMobilePlayerController : NetworkBehaviour
     public float neutralAngle = 90f;
 
     [Tooltip("How far from neutral before full input is reached.")]
-    public float angleRange = 45f;
+    public float angleRange = 42f;
 
     [Tooltip("Smooths mobile input.")]
     public float inputSmoothing = 6f;
 
     [Tooltip("Tick this if forward/backward feels reversed on device.")]
     public bool invertForwardBackward = false;
+
+    [Header("Slope Speed Effect")]
+    public bool useSlopeSpeedEffect = true;
+    public float uphillSlowdown = 1.2f;
+    public float downhillBoost = 0.25f;
 
     [Header("Input Start")]
     [Tooltip("If true, owner input starts automatically after delay.")]
@@ -63,6 +68,8 @@ public class NetworkMobilePlayerController : NetworkBehaviour
     [Header("Debug")]
     [SerializeField] private float debugPhoneAngle = 90f;
     [SerializeField] private float debugForwardInput = 0f;
+    [SerializeField] private float debugSlopeY = 0f;
+    [SerializeField] private float debugSlopeMultiplier = 1f;
 
     private Rigidbody rb;
     private bool initialized = false;
@@ -283,8 +290,16 @@ public class NetworkMobilePlayerController : NetworkBehaviour
         var sp = rr.container.Splines[rr.splineIndex];
         var wM = rr.container.transform.localToWorldMatrix;
 
+        Vector3 tangent = rr.container.transform.TransformDirection(
+            (Vector3)SplineUtility.EvaluateTangent(sp, T)
+        ).normalized;
+
         float input = GetForwardInput();
-        float targetSpeed = input * maxSpeed;
+        float slopeMultiplier = GetSlopeSpeedMultiplier(tangent.y, input);
+        float targetSpeed = input * maxSpeed * slopeMultiplier;
+
+        debugSlopeY = tangent.y;
+        debugSlopeMultiplier = slopeMultiplier;
 
         vAlong = Mathf.MoveTowards(vAlong, targetSpeed, accel * Time.fixedDeltaTime);
 
@@ -296,7 +311,7 @@ public class NetworkMobilePlayerController : NetworkBehaviour
             (Vector3)SplineUtility.EvaluatePosition(sp, T)
         ) + playerOffset;
 
-        Vector3 tangent = rr.container.transform.TransformDirection(
+        tangent = rr.container.transform.TransformDirection(
             (Vector3)SplineUtility.EvaluateTangent(sp, T)
         ).normalized;
 
@@ -321,6 +336,28 @@ public class NetworkMobilePlayerController : NetworkBehaviour
 
             rb.AddTorque(torque, ForceMode.Acceleration);
         }
+    }
+
+    float GetSlopeSpeedMultiplier(float slopeY, float input)
+    {
+        if (!useSlopeSpeedEffect || Mathf.Approximately(input, 0f))
+            return 1f;
+
+        float travelSlope = slopeY * Mathf.Sign(input);
+        float multiplier = 1f;
+
+        if (travelSlope > 0f)
+        {
+            // uphill
+            multiplier -= travelSlope * uphillSlowdown;
+        }
+        else if (travelSlope < 0f)
+        {
+            // downhill
+            multiplier += (-travelSlope) * downhillBoost;
+        }
+
+        return Mathf.Clamp(multiplier, 0.3f, 1.5f);
     }
 
     float GetForwardInput()
@@ -367,11 +404,8 @@ public class NetworkMobilePlayerController : NetworkBehaviour
 
         float angle = Vector3.SignedAngle(Vector3.back, g, Vector3.right);
 
-        if (angle < 0f)
-            angle += 360f;
-
-        if (angle > 180f)
-            angle = 360f - angle;
+        if (angle < 0f) angle += 360f;
+        if (angle > 180f) angle = 360f - angle;
 
         return angle;
     }

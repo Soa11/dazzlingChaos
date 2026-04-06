@@ -578,7 +578,7 @@ MonoBehaviour:
   - container: {fileID: 0}
     splineIndex: 0
   maxSpeed: 18
-  accel: 12
+  accel: 10
   inputDeadzone: 0.08
   posSpring: 80
   posDamping: 12
@@ -589,11 +589,16 @@ MonoBehaviour:
   angleRange: 42
   inputSmoothing: 6
   invertForwardBackward: 0
+  useSlopeSpeedEffect: 1
+  uphillSlowdown: 2
+  downhillBoost: 0.5
   autoEnableInput: 1
   autoEnableDelay: 5
   inputEnabled: 0
   debugPhoneAngle: 90
   debugForwardInput: 0
+  debugSlopeY: 0
+  debugSlopeMultiplier: 1
 --- !u!114 &105538998702399004
 MonoBehaviour:
   m_ObjectHideFlags: 0
