@@ -72,7 +72,7 @@ Material:
     - _DepthMin: 0
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _Emission_Intensity: 0.5
+    - _Emission_Intensity: 0.2
     - _MinAlpha: 0.1
     - _Normal_Strength: 0.5
     - _QueueControl: 0
@@ -82,14 +82,15 @@ Material:
     - _SrcBlendAlpha: 1
     - _Surface: 0
     - _WorkflowMode: 1
+    - _XRMotionVectorsPass: 1
     - _ZTest: 4
     - _ZWrite: 1
     - _ZWriteControl: 0
     - _minAlpha: 0.2
     - _minBrightness: 0
     m_Colors:
-    - _Base_Colour: {r: 0.3490566, g: 0.13336597, b: 0.28522977, a: 1}
-    - _Emission_Colour: {r: 1.2470589, g: 0.47843137, b: 1.0196079, a: 1}
+    - _Base_Colour: {r: 0.54509807, g: 0.034798868, b: 0.4339623, a: 1}
+    - _Emission_Colour: {r: 0.08254717, g: 0.00038937439, b: 0.072810955, a: 1}
     - _Height_Tiling: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

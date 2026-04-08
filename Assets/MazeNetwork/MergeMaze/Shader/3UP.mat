@@ -26,6 +26,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _ALPHATEST_ON
+  - _RECEIVE_SHADOWS_OFF
   m_InvalidKeywords: []
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
@@ -35,6 +36,7 @@ Material:
     RenderType: TransparentCutout
   disabledShaderPasses:
   - MOTIONVECTORS
+  - SHADOWCASTER
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -66,7 +68,7 @@ Material:
     - _Alpha_Clip_Threshold: 0.2
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
-    - _CastShadows: 1
+    - _CastShadows: 0
     - _Cull: 0
     - _DepthMax: 0
     - _DepthMin: 0
@@ -77,19 +79,20 @@ Material:
     - _Normal_Strength: 0.5
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _ReceiveShadows: 1
+    - _ReceiveShadows: 0
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
     - _WorkflowMode: 1
+    - _XRMotionVectorsPass: 1
     - _ZTest: 4
     - _ZWrite: 1
     - _ZWriteControl: 0
     - _minAlpha: 0.2
     - _minBrightness: 0
     m_Colors:
-    - _Base_Colour: {r: 0.3490566, g: 0.13336597, b: 0.28522977, a: 1}
-    - _Emission_Colour: {r: 1.2470589, g: 0.47843137, b: 1.0196079, a: 1}
+    - _Base_Colour: {r: 0.24705882, g: 0, b: 0.13207549, a: 1}
+    - _Emission_Colour: {r: 0.1627451, g: 0, b: 0.22788121, a: 1}
     - _Height_Tiling: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
