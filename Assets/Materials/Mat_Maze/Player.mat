@@ -38,8 +38,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - Vector1_0395056422a44efd961aa8b82a7cac27: 2
-    - _Emision_Intensity: 0.1
+    - Vector1_0395056422a44efd961aa8b82a7cac27: 1
+    - _Emision_Intensity: 0.3
     - _InnerAlpha: 0.1
     - _QueueControl: 0
     - _QueueOffset: 0
