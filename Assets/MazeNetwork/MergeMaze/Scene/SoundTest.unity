@@ -146219,6 +146219,7 @@ GameObject:
   - component: {fileID: 689254151}
   - component: {fileID: 689254155}
   - component: {fileID: 689254156}
+  - component: {fileID: 689254157}
   m_Layer: 7
   m_Name: Mobile_Player with Camera
   m_TagString: Untagged
@@ -146411,13 +146412,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee8e410d6daef3248842d212fd340951, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerVerticalStateDetector
-  player: {fileID: 689254154}
-  averageWindowSeconds: 3
-  switchThreshold: 0.01
+  slopeReader: {fileID: 689254157}
+  enterUpThreshold: 0.4
+  enterDownThreshold: -0.4
+  exitUpToFlatThreshold: 0.03
+  exitDownToFlatThreshold: -0.03
   currentVerticalState: 0
-  currentAverageY: 0
-  previousAverageY: 0
-  averageDifference: 0
+  currentSlopeY: 0
+--- !u!114 &689254157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 689254150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52ac411c517e80848acad05b2f4947bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSlopeReader
+  playerController: {fileID: 689254155}
+  currentSlopeY: 0
+  currentTangent: {x: 0, y: 0, z: 1}
 --- !u!1 &696894181
 GameObject:
   m_ObjectHideFlags: 0
@@ -293569,10 +293585,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StateAudioSwitcher
   stateDetector: {fileID: 689254156}
   audioSource: {fileID: 1389879520}
-  upClip: {fileID: 8300000, guid: 8514be91275a0b74487304de3efd3e0b, type: 3}
-  downClip: {fileID: 8300000, guid: 4f6f685b533413347a27ea04c3015b64, type: 3}
-  switchCooldown: 1.5
+  flatClip: {fileID: 8300000, guid: 4e59f319c3e45d14c839b4628a2867e3, type: 3}
+  upClip: {fileID: 8300000, guid: ffb159a21c8a04135a5616979c828fab, type: 3}
+  downClip: {fileID: 8300000, guid: 7e9ee6dc04a5d40d1a5dfc4beb9865e7, type: 3}
+  minHoldTime: 0.7
   currentClipName: 
+  currentAudioStateName: 
 --- !u!82 &1389879520
 AudioSource:
   m_ObjectHideFlags: 0
@@ -293585,7 +293603,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 1

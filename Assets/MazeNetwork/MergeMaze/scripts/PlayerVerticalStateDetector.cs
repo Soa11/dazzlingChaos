@@ -4,94 +4,74 @@ public class PlayerVerticalStateDetector : MonoBehaviour
 {
     public enum VerticalState
     {
+        Flat,
         Up,
         Down
     }
 
     [Header("References")]
-    public Transform player;
+    public PlayerSlopeReader slopeReader;
 
-    [Header("Averaging Window")]
-    [Tooltip("How long to average Y values before comparing to the previous average.")]
-    public float averageWindowSeconds = 0.25f;
+    [Header("Enter Thresholds")]
+    [Tooltip("Must go above this to enter Up.")]
+    public float enterUpThreshold = 0.12f;
 
-    [Tooltip("Minimum average Y difference needed to change state.")]
-    public float switchThreshold = 0.005f;
+    [Tooltip("Must go below this to enter Down.")]
+    public float enterDownThreshold = -0.12f;
+
+    [Header("Exit Thresholds")]
+    [Tooltip("When currently Up, come back to Flat if slopeY drops below this.")]
+    public float exitUpToFlatThreshold = 0.08f;
+
+    [Tooltip("When currently Down, come back to Flat if slopeY rises above this.")]
+    public float exitDownToFlatThreshold = -0.08f;
 
     [Header("Debug")]
-    public VerticalState currentVerticalState = VerticalState.Down;
-
-    public float currentAverageY = 0f;
-    public float previousAverageY = 0f;
-    public float averageDifference = 0f;
-
-    private float timer = 0f;
-    private float ySum = 0f;
-    private int sampleCount = 0;
+    public VerticalState currentVerticalState = VerticalState.Flat;
+    public float currentSlopeY = 0f;
 
     private VerticalState previousVerticalState;
-    private bool hasPreviousAverage = false;
 
     void Start()
     {
         previousVerticalState = currentVerticalState;
-
-        if (player != null)
-        {
-            currentAverageY = player.position.y;
-            previousAverageY = player.position.y;
-        }
     }
 
     void Update()
     {
-        if (player == null)
+        if (slopeReader == null)
             return;
 
-        // Collect samples during the window
-        ySum += player.position.y;
-        sampleCount++;
-        timer += Time.deltaTime;
+        currentSlopeY = slopeReader.currentSlopeY;
 
-        if (timer >= averageWindowSeconds && sampleCount > 0)
+        switch (currentVerticalState)
         {
-            currentAverageY = ySum / sampleCount;
-
-            if (hasPreviousAverage)
-            {
-                averageDifference = currentAverageY - previousAverageY;
-
-                if (averageDifference > switchThreshold)
-                {
+            case VerticalState.Flat:
+                if (currentSlopeY > enterUpThreshold)
                     currentVerticalState = VerticalState.Up;
-                }
-                else if (averageDifference < -switchThreshold)
-                {
+                else if (currentSlopeY < enterDownThreshold)
                     currentVerticalState = VerticalState.Down;
-                }
-                // If within threshold, keep previous state
+                break;
 
-                if (currentVerticalState != previousVerticalState)
-                {
-                    Debug.Log(
-                        $"Vertical State Changed -> {currentVerticalState} " +
-                        $"(prevAvgY: {previousAverageY:F4}, currentAvgY: {currentAverageY:F4}, diff: {averageDifference:F4})"
-                    );
+            case VerticalState.Up:
+                if (currentSlopeY < exitUpToFlatThreshold)
+                    currentVerticalState = VerticalState.Flat;
+                break;
 
-                    previousVerticalState = currentVerticalState;
-                }
-            }
+            case VerticalState.Down:
+                if (currentSlopeY > exitDownToFlatThreshold)
+                    currentVerticalState = VerticalState.Flat;
+                break;
+        }
 
-            previousAverageY = currentAverageY;
-            hasPreviousAverage = true;
-
-            // Reset window
-            timer = 0f;
-            ySum = 0f;
-            sampleCount = 0;
+        if (currentVerticalState != previousVerticalState)
+        {
+            Debug.Log($"Vertical State Changed -> {currentVerticalState} | slopeY = {currentSlopeY:F4}");
+            previousVerticalState = currentVerticalState;
         }
     }
 
     public bool IsUp => currentVerticalState == VerticalState.Up;
     public bool IsDown => currentVerticalState == VerticalState.Down;
+    public bool IsFlat => currentVerticalState == VerticalState.Flat;
 }
