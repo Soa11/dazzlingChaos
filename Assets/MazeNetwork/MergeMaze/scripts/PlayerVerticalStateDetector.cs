@@ -4,7 +4,6 @@ public class PlayerVerticalStateDetector : MonoBehaviour
 {
     public enum VerticalState
     {
-        Flat,
         Up,
         Down
     }
@@ -12,27 +11,36 @@ public class PlayerVerticalStateDetector : MonoBehaviour
     [Header("References")]
     public Transform player;
 
-    [Header("Tuning")]
-    [Tooltip("How much Y change counts as real movement instead of tiny jitter.")]
-    public float threshold = 0.002f;
+    [Header("Averaging Window")]
+    [Tooltip("How long to average Y values before comparing to the previous average.")]
+    public float averageWindowSeconds = 0.25f;
 
-    [Tooltip("Higher = smoother, lower = more immediate.")]
-    public float smoothing = 6f;
+    [Tooltip("Minimum average Y difference needed to change state.")]
+    public float switchThreshold = 0.005f;
 
     [Header("Debug")]
-    public VerticalState currentState = VerticalState.Flat;
-    public float rawDeltaY = 0f;
-    public float smoothedDeltaY = 0f;
+    public VerticalState currentVerticalState = VerticalState.Down;
 
-    private float previousY;
-    private VerticalState previousState;
+    public float currentAverageY = 0f;
+    public float previousAverageY = 0f;
+    public float averageDifference = 0f;
+
+    private float timer = 0f;
+    private float ySum = 0f;
+    private int sampleCount = 0;
+
+    private VerticalState previousVerticalState;
+    private bool hasPreviousAverage = false;
 
     void Start()
     {
-        if (player != null)
-            previousY = player.position.y;
+        previousVerticalState = currentVerticalState;
 
-        previousState = currentState;
+        if (player != null)
+        {
+            currentAverageY = player.position.y;
+            previousAverageY = player.position.y;
+        }
     }
 
     void Update()
@@ -40,32 +48,50 @@ public class PlayerVerticalStateDetector : MonoBehaviour
         if (player == null)
             return;
 
-        float currentY = player.position.y;
-        rawDeltaY = currentY - previousY;
+        // Collect samples during the window
+        ySum += player.position.y;
+        sampleCount++;
+        timer += Time.deltaTime;
 
-        smoothedDeltaY = Mathf.Lerp(
-            smoothedDeltaY,
-            rawDeltaY,
-            smoothing * Time.deltaTime
-        );
-
-        if (smoothedDeltaY > threshold)
-            currentState = VerticalState.Up;
-        else if (smoothedDeltaY < -threshold)
-            currentState = VerticalState.Down;
-        else
-            currentState = VerticalState.Flat;
-
-        if (currentState != previousState)
+        if (timer >= averageWindowSeconds && sampleCount > 0)
         {
-            Debug.Log($"Vertical State Changed -> {currentState}");
-            previousState = currentState;
-        }
+            currentAverageY = ySum / sampleCount;
 
-        previousY = currentY;
+            if (hasPreviousAverage)
+            {
+                averageDifference = currentAverageY - previousAverageY;
+
+                if (averageDifference > switchThreshold)
+                {
+                    currentVerticalState = VerticalState.Up;
+                }
+                else if (averageDifference < -switchThreshold)
+                {
+                    currentVerticalState = VerticalState.Down;
+                }
+                // If within threshold, keep previous state
+
+                if (currentVerticalState != previousVerticalState)
+                {
+                    Debug.Log(
+                        $"Vertical State Changed -> {currentVerticalState} " +
+                        $"(prevAvgY: {previousAverageY:F4}, currentAvgY: {currentAverageY:F4}, diff: {averageDifference:F4})"
+                    );
+
+                    previousVerticalState = currentVerticalState;
+                }
+            }
+
+            previousAverageY = currentAverageY;
+            hasPreviousAverage = true;
+
+            // Reset window
+            timer = 0f;
+            ySum = 0f;
+            sampleCount = 0;
+        }
     }
 
-    public bool IsUp => currentState == VerticalState.Up;
-    public bool IsDown => currentState == VerticalState.Down;
-    public bool IsFlat => currentState == VerticalState.Flat;
+    public bool IsUp => currentVerticalState == VerticalState.Up;
+    public bool IsDown => currentVerticalState == VerticalState.Down;
 }
