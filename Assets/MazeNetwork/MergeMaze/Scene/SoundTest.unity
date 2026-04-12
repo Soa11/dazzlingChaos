@@ -582,6 +582,7 @@ MonoBehaviour:
   m_Script: {fileID: 1909489390}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &231612070
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -48944,6 +48945,7 @@ MonoBehaviour:
   m_Script: {fileID: 1012161356}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &306000071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -97791,6 +97793,7 @@ MonoBehaviour:
   m_Script: {fileID: 1909489390}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &425046045
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146412,8 +146415,10 @@ MonoBehaviour:
   slopeReader: {fileID: 689254157}
   enterUpThreshold: 0.4
   enterDownThreshold: -0.4
-  exitUpToFlatThreshold: 0.03
-  exitDownToFlatThreshold: -0.03
+  upToDownThreshold: -0.4
+  downToUpThreshold: 0.4
+  flatZoneThreshold: 0.12
+  flatHoldTime: 0.15
   currentVerticalState: 0
   currentSlopeY: 0
 --- !u!114 &689254157
@@ -147092,6 +147097,7 @@ MonoBehaviour:
   m_Script: {fileID: 1295221894}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &768893763
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195826,6 +195832,7 @@ MonoBehaviour:
   m_Script: {fileID: 1909489390}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &863149079
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244445,6 +244452,7 @@ MonoBehaviour:
   m_Script: {fileID: 1909489390}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::SplineInfo
+  SegmentNames: []
 --- !u!114 &997896912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -293579,9 +293587,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StateAudioSwitcher
   stateDetector: {fileID: 689254156}
   audioSource: {fileID: 1389879520}
-  flatClip: {fileID: 8300000, guid: 3f16069a02d07cc40afb21760e9f4e85, type: 3}
-  upClip: {fileID: 8300000, guid: 02e15923b0c91cc45b219922a9cd4616, type: 3}
-  downClip: {fileID: 8300000, guid: 62ff17a09e1bd2741af3f176cbcaeb6d, type: 3}
+  flatClip: {fileID: 8300000, guid: 073a9a10acc65924889650fc746b52bb, type: 3}
+  upClip: {fileID: 8300000, guid: f3a922bc64a718e4bb89e7c77df1751b, type: 3}
+  downClip: {fileID: 8300000, guid: 3abadcfc74764844e84e0367254dc82b, type: 3}
   minHoldTime: 0.7
   currentClipName: 
   currentAudioStateName: 
