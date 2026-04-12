@@ -1,15 +1,11 @@
 using UnityEngine;
+using System.Collections;
 
 public class StateAudioSwitcher : MonoBehaviour
 {
     [Header("References")]
     public PlayerVerticalStateDetector stateDetector;
-
-    [Tooltip("Main AudioSource")]
-    public AudioSource audioSourceA;
-
-    [Tooltip("Second AudioSource for crossfade")]
-    public AudioSource audioSourceB;
+    public AudioSource audioSource;
 
     [Header("Clips")]
     public AudioClip flatClip;
@@ -17,15 +13,13 @@ public class StateAudioSwitcher : MonoBehaviour
     public AudioClip downClip;
 
     [Header("Timing")]
-    [Tooltip("Minimum time the current sound should stay before switching.")]
-    public float minHoldTime = 0.25f;
+    public float minHoldTime = 0.30f;
+    public float fadeOutTime = 0.03f;
+    public float fadeInTime = 0.06f;
 
-    [Tooltip("How long to crossfade between clips.")]
-    public float crossfadeDuration = 0.28f;
-
-    [Header("Volumes")]
+    [Header("Volume")]
     [Range(0f, 1f)]
-    public float targetVolume = 1f;
+    public float targetVolume = 0.6f;
 
     [Header("Debug")]
     public string currentClipName = "";
@@ -41,61 +35,74 @@ public class StateAudioSwitcher : MonoBehaviour
     private AudioState currentAudioState;
     private float lastSwitchTime = -999f;
     private bool initialized = false;
-
-    private AudioSource activeSource;
-    private AudioSource inactiveSource;
-
-    private bool isCrossfading = false;
-    private float crossfadeTimer = 0f;
-    private float fadeOutStartVolume = 0f;
-    private float fadeInTargetVolume = 1f;
+    private bool isSwitching = false;
+    private Coroutine switchRoutine;
 
     void Start()
     {
-        if (stateDetector == null || audioSourceA == null || audioSourceB == null ||
-            flatClip == null || upClip == null || downClip == null)
+        Debug.Log("[StateAudioSwitcher] Start called");
+
+        if (stateDetector == null)
         {
-            Debug.LogWarning("[StateAudioSwitcher] Missing reference.");
-            enabled = false;
+            Debug.LogError("[StateAudioSwitcher] stateDetector is missing");
             return;
         }
 
-        PrepareSource(audioSourceA);
-        PrepareSource(audioSourceB);
+        if (audioSource == null)
+        {
+            Debug.LogError("[StateAudioSwitcher] audioSource is missing");
+            return;
+        }
 
-        activeSource = audioSourceA;
-        inactiveSource = audioSourceB;
+        if (flatClip == null)
+        {
+            Debug.LogError("[StateAudioSwitcher] flatClip is missing");
+            return;
+        }
+
+        if (upClip == null)
+        {
+            Debug.LogError("[StateAudioSwitcher] upClip is missing");
+            return;
+        }
+
+        if (downClip == null)
+        {
+            Debug.LogError("[StateAudioSwitcher] downClip is missing");
+            return;
+        }
+
+        audioSource.playOnAwake = false;
+        audioSource.loop = true;
+        audioSource.volume = targetVolume;
 
         if (stateDetector.IsUp)
         {
             currentAudioState = AudioState.Up;
-            PlayImmediate(activeSource, upClip, targetVolume);
+            PlayImmediate(upClip);
         }
         else if (stateDetector.IsDown)
         {
             currentAudioState = AudioState.Down;
-            PlayImmediate(activeSource, downClip, targetVolume);
+            PlayImmediate(downClip);
         }
         else
         {
             currentAudioState = AudioState.Flat;
-            PlayImmediate(activeSource, flatClip, targetVolume);
+            PlayImmediate(flatClip);
         }
-
-        inactiveSource.volume = 0f;
-        inactiveSource.Stop();
 
         currentAudioStateName = currentAudioState.ToString();
         lastSwitchTime = Time.time;
         initialized = true;
+
+        Debug.Log("[StateAudioSwitcher] Initialized successfully");
     }
 
     void Update()
     {
-        if (!initialized)
+        if (!initialized || isSwitching)
             return;
-
-        UpdateCrossfade();
 
         AudioState wantedState = currentAudioState;
 
@@ -116,114 +123,85 @@ public class StateAudioSwitcher : MonoBehaviour
         currentAudioStateName = currentAudioState.ToString();
         lastSwitchTime = Time.time;
 
+        AudioClip targetClip = flatClip;
+
         switch (currentAudioState)
         {
             case AudioState.Flat:
-                CrossfadeTo(flatClip);
-                Debug.Log("[StateAudioSwitcher] Crossfading to FLAT clip");
+                targetClip = flatClip;
+                Debug.Log("[StateAudioSwitcher] Switching to FLAT");
                 break;
 
             case AudioState.Up:
-                CrossfadeTo(upClip);
-                Debug.Log("[StateAudioSwitcher] Crossfading to UP clip");
+                targetClip = upClip;
+                Debug.Log("[StateAudioSwitcher] Switching to UP");
                 break;
 
             case AudioState.Down:
-                CrossfadeTo(downClip);
-                Debug.Log("[StateAudioSwitcher] Crossfading to DOWN clip");
+                targetClip = downClip;
+                Debug.Log("[StateAudioSwitcher] Switching to DOWN");
                 break;
         }
+
+        if (switchRoutine != null)
+            StopCoroutine(switchRoutine);
+
+        switchRoutine = StartCoroutine(SwitchWithFade(targetClip));
     }
 
-    void PrepareSource(AudioSource source)
+    void PlayImmediate(AudioClip clip)
     {
-        source.playOnAwake = false;
-        source.loop = true;
-        source.volume = 0f;
-    }
-
-    void PlayImmediate(AudioSource source, AudioClip clip, float volume)
-    {
-        if (source == null || clip == null)
-            return;
-
-        source.Stop();
-        source.clip = clip;
-        source.loop = true;
-        source.volume = volume;
-        source.Play();
+        audioSource.Stop();
+        audioSource.clip = clip;
+        audioSource.loop = true;
+        audioSource.volume = targetVolume;
+        audioSource.Play();
 
         currentClipName = clip.name;
+        Debug.Log("[StateAudioSwitcher] Playing initial clip: " + clip.name);
     }
 
-    void CrossfadeTo(AudioClip newClip)
+    IEnumerator SwitchWithFade(AudioClip newClip)
     {
-        if (newClip == null || inactiveSource == null || activeSource == null)
-            return;
+        if (newClip == null)
+            yield break;
 
-        // If active source is already playing this clip, do nothing
-        if (activeSource.clip == newClip && activeSource.isPlaying)
-            return;
+        if (audioSource.clip == newClip && audioSource.isPlaying)
+            yield break;
 
-        inactiveSource.Stop();
-        inactiveSource.clip = newClip;
-        inactiveSource.loop = true;
-        inactiveSource.volume = 0f;
-        inactiveSource.Play();
+        isSwitching = true;
 
-        fadeOutStartVolume = activeSource.volume;
-        fadeInTargetVolume = targetVolume;
+        float startVolume = audioSource.volume;
 
-        crossfadeTimer = 0f;
-        isCrossfading = true;
+        float t = 0f;
+        while (t < fadeOutTime)
+        {
+            t += Time.deltaTime;
+            float k = Mathf.Clamp01(t / fadeOutTime);
+            audioSource.volume = Mathf.Lerp(startVolume, 0f, k);
+            yield return null;
+        }
+
+        audioSource.volume = 0f;
+        audioSource.Stop();
+        audioSource.clip = newClip;
+        audioSource.loop = true;
+        audioSource.Play();
 
         currentClipName = newClip.name;
-    }
+        Debug.Log("[StateAudioSwitcher] New clip started: " + newClip.name);
 
-    void UpdateCrossfade()
-    {
-        if (!isCrossfading)
-            return;
-
-        if (crossfadeDuration <= 0f)
+        t = 0f;
+        while (t < fadeInTime)
         {
-            FinishCrossfadeImmediate();
-            return;
+            t += Time.deltaTime;
+            float k = Mathf.Clamp01(t / fadeInTime);
+            audioSource.volume = Mathf.Lerp(0f, targetVolume, k);
+            yield return null;
         }
 
-        crossfadeTimer += Time.deltaTime;
-        float t = Mathf.Clamp01(crossfadeTimer / crossfadeDuration);
-
-        // SmoothStep makes the blend softer than linear
-        t = t * t * (3f - 2f * t);
-
-        activeSource.volume = Mathf.Lerp(fadeOutStartVolume, 0f, t);
-        inactiveSource.volume = Mathf.Lerp(0f, fadeInTargetVolume, t);
-
-        if (crossfadeTimer >= crossfadeDuration)
-        {
-            activeSource.Stop();
-            activeSource.volume = 0f;
-
-            AudioSource oldActive = activeSource;
-            activeSource = inactiveSource;
-            inactiveSource = oldActive;
-
-            isCrossfading = false;
-        }
-    }
-
-    void FinishCrossfadeImmediate()
-    {
-        activeSource.Stop();
-        activeSource.volume = 0f;
-
-        inactiveSource.volume = fadeInTargetVolume;
-
-        AudioSource oldActive = activeSource;
-        activeSource = inactiveSource;
-        inactiveSource = oldActive;
-
-        isCrossfading = false;
+        audioSource.volume = targetVolume;
+        isSwitching = false;
+        switchRoutine = null;
     }
 }
