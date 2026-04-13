@@ -26,6 +26,7 @@ public class StateAudioSwitcher : NetworkBehaviour
     public string currentClipName = "";
     public string currentAudioStateName = "";
     public bool isLocalAudioPlayer = false;
+    public bool initialized = false;
 
     private enum AudioState
     {
@@ -34,9 +35,8 @@ public class StateAudioSwitcher : NetworkBehaviour
         Down
     }
 
-    private AudioState currentAudioState;
+    private AudioState currentAudioState = AudioState.Flat;
     private float lastSwitchTime = -999f;
-    private bool initialized = false;
     private bool isSwitching = false;
     private Coroutine switchRoutine;
 
@@ -44,18 +44,10 @@ public class StateAudioSwitcher : NetworkBehaviour
     {
         base.OnNetworkSpawn();
 
-        isLocalAudioPlayer = IsOwner;
-
-        if (audioSource != null)
-        {
-            audioSource.playOnAwake = false;
-            audioSource.loop = true;
-            audioSource.spatialBlend = 0f; // local player test = 2D
-        }
-
-        // Only the owning local player should run this audio system
         if (!IsOwner)
         {
+            isLocalAudioPlayer = false;
+
             if (audioSource != null)
             {
                 audioSource.Stop();
@@ -66,78 +58,68 @@ public class StateAudioSwitcher : NetworkBehaviour
             return;
         }
 
-        InitializeAudio();
+        isLocalAudioPlayer = true;
+
+        if (audioSource != null)
+        {
+            audioSource.enabled = true;
+            audioSource.playOnAwake = false;
+            audioSource.loop = true;
+            audioSource.spatialBlend = 0f;
+            audioSource.volume = targetVolume;
+        }
+
+        StartCoroutine(WaitAndInitialize());
     }
 
-    void Start()
+    private IEnumerator WaitAndInitialize()
     {
-        // In NGO, spawned prefab setup should happen in OnNetworkSpawn.
-        // Keep Start empty to avoid initializing before ownership is known.
-    }
-
-    void InitializeAudio()
-    {
-        Debug.Log("[StateAudioSwitcher] InitializeAudio called");
+        yield return null;
 
         if (stateDetector == null)
         {
             Debug.LogError("[StateAudioSwitcher] stateDetector is missing");
-            return;
+            yield break;
         }
 
         if (audioSource == null)
         {
             Debug.LogError("[StateAudioSwitcher] audioSource is missing");
-            return;
+            yield break;
         }
 
-        if (flatClip == null)
+        if (flatClip == null || upClip == null || downClip == null)
         {
-            Debug.LogError("[StateAudioSwitcher] flatClip is missing");
-            return;
+            Debug.LogError("[StateAudioSwitcher] One or more clips are missing");
+            yield break;
         }
 
-        if (upClip == null)
-        {
-            Debug.LogError("[StateAudioSwitcher] upClip is missing");
-            return;
-        }
-
-        if (downClip == null)
-        {
-            Debug.LogError("[StateAudioSwitcher] downClip is missing");
-            return;
-        }
-
-        audioSource.enabled = true;
-        audioSource.volume = targetVolume;
+        AudioClip initialClip = flatClip;
+        currentAudioState = AudioState.Flat;
 
         if (stateDetector.IsUp)
         {
+            initialClip = upClip;
             currentAudioState = AudioState.Up;
-            PlayImmediate(upClip);
         }
         else if (stateDetector.IsDown)
         {
+            initialClip = downClip;
             currentAudioState = AudioState.Down;
-            PlayImmediate(downClip);
         }
-        else
-        {
-            currentAudioState = AudioState.Flat;
-            PlayImmediate(flatClip);
-        }
+
+        PlayImmediate(initialClip);
 
         currentAudioStateName = currentAudioState.ToString();
         lastSwitchTime = Time.time;
         initialized = true;
 
-        Debug.Log("[StateAudioSwitcher] Initialized successfully for owner");
+        Debug.Log("[StateAudioSwitcher] Initialized successfully for local owner");
     }
 
     void Update()
     {
-        if (!initialized || isSwitching)
+        if (!IsOwner || !initialized || isSwitching)
             return;
 
         AudioState wantedState = currentAudioState;
@@ -155,19 +137,19 @@ public class StateAudioSwitcher : NetworkBehaviour
         if (Time.time < lastSwitchTime + minHoldTime)
             return;
 
-        currentAudioState = wantedState;
-        currentAudioStateName = currentAudioState.ToString();
+        PerformStateSwitch(wantedState);
+    }
+
+    private void PerformStateSwitch(AudioState newState)
+    {
+        currentAudioState = newState;
+        currentAudioStateName = newState.ToString();
         lastSwitchTime = Time.time;
 
         AudioClip targetClip = flatClip;
 
-        switch (currentAudioState)
+        switch (newState)
         {
-            case AudioState.Flat:
-                targetClip = flatClip;
-                Debug.Log("[StateAudioSwitcher] Switching to FLAT");
-                break;
-
             case AudioState.Up:
                 targetClip = upClip;
                 Debug.Log("[StateAudioSwitcher] Switching to UP");
@@ -176,6 +158,11 @@ public class StateAudioSwitcher : NetworkBehaviour
             case AudioState.Down:
                 targetClip = downClip;
                 Debug.Log("[StateAudioSwitcher] Switching to DOWN");
+                break;
+
+            default:
+                targetClip = flatClip;
+                Debug.Log("[StateAudioSwitcher] Switching to FLAT");
                 break;
         }
 
