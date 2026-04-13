@@ -1,7 +1,8 @@
 using UnityEngine;
+using Unity.Netcode;
 using System.Collections;
 
-public class StateAudioSwitcher : MonoBehaviour
+public class StateAudioSwitcher : NetworkBehaviour
 {
     [Header("References")]
     public PlayerVerticalStateDetector stateDetector;
@@ -24,6 +25,7 @@ public class StateAudioSwitcher : MonoBehaviour
     [Header("Debug")]
     public string currentClipName = "";
     public string currentAudioStateName = "";
+    public bool isLocalAudioPlayer = false;
 
     private enum AudioState
     {
@@ -38,9 +40,44 @@ public class StateAudioSwitcher : MonoBehaviour
     private bool isSwitching = false;
     private Coroutine switchRoutine;
 
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        isLocalAudioPlayer = IsOwner;
+
+        if (audioSource != null)
+        {
+            audioSource.playOnAwake = false;
+            audioSource.loop = true;
+            audioSource.spatialBlend = 0f; // local player test = 2D
+        }
+
+        // Only the owning local player should run this audio system
+        if (!IsOwner)
+        {
+            if (audioSource != null)
+            {
+                audioSource.Stop();
+                audioSource.enabled = false;
+            }
+
+            enabled = false;
+            return;
+        }
+
+        InitializeAudio();
+    }
+
     void Start()
     {
-        Debug.Log("[StateAudioSwitcher] Start called");
+        // In NGO, spawned prefab setup should happen in OnNetworkSpawn.
+        // Keep Start empty to avoid initializing before ownership is known.
+    }
+
+    void InitializeAudio()
+    {
+        Debug.Log("[StateAudioSwitcher] InitializeAudio called");
 
         if (stateDetector == null)
         {
@@ -72,8 +109,7 @@ public class StateAudioSwitcher : MonoBehaviour
             return;
         }
 
-        audioSource.playOnAwake = false;
-        audioSource.loop = true;
+        audioSource.enabled = true;
         audioSource.volume = targetVolume;
 
         if (stateDetector.IsUp)
@@ -96,7 +132,7 @@ public class StateAudioSwitcher : MonoBehaviour
         lastSwitchTime = Time.time;
         initialized = true;
 
-        Debug.Log("[StateAudioSwitcher] Initialized successfully");
+        Debug.Log("[StateAudioSwitcher] Initialized successfully for owner");
     }
 
     void Update()
@@ -151,6 +187,9 @@ public class StateAudioSwitcher : MonoBehaviour
 
     void PlayImmediate(AudioClip clip)
     {
+        if (clip == null || audioSource == null)
+            return;
+
         audioSource.Stop();
         audioSource.clip = clip;
         audioSource.loop = true;
@@ -163,7 +202,7 @@ public class StateAudioSwitcher : MonoBehaviour
 
     IEnumerator SwitchWithFade(AudioClip newClip)
     {
-        if (newClip == null)
+        if (newClip == null || audioSource == null)
             yield break;
 
         if (audioSource.clip == newClip && audioSource.isPlaying)
@@ -203,5 +242,17 @@ public class StateAudioSwitcher : MonoBehaviour
         audioSource.volume = targetVolume;
         isSwitching = false;
         switchRoutine = null;
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        if (audioSource != null)
+            audioSource.Stop();
+
+        initialized = false;
+        isSwitching = false;
+        switchRoutine = null;
+
+        base.OnNetworkDespawn();
     }
 }
