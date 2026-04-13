@@ -269,6 +269,8 @@ GameObject:
   - component: {fileID: 662556809993771443}
   - component: {fileID: 105538998702399004}
   - component: {fileID: 7747803852965809534}
+  - component: {fileID: 1597127707711638305}
+  - component: {fileID: 5560221494074739157}
   m_Layer: 0
   m_Name: Maze_Player
   m_TagString: Untagged
@@ -628,6 +630,42 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   spawnRootName: SpawnPoint
   useRoundRobin: 1
+--- !u!114 &1597127707711638305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4874197185426328121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52ac411c517e80848acad05b2f4947bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSlopeReader
+  playerController: {fileID: 662556809993771443}
+  currentSlopeY: 0
+  currentTangent: {x: 0, y: 0, z: 1}
+--- !u!114 &5560221494074739157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4874197185426328121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee8e410d6daef3248842d212fd340951, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerVerticalStateDetector
+  slopeReader: {fileID: 1597127707711638305}
+  enterUpThreshold: 0.6
+  enterDownThreshold: -0.4
+  upToDownThreshold: -0.4
+  downToUpThreshold: 0.6
+  flatZoneThreshold: 0.06
+  flatHoldTime: 0.28
+  currentVerticalState: 0
+  currentSlopeY: 0
 --- !u!1 &5562377253855626803
 GameObject:
   m_ObjectHideFlags: 0

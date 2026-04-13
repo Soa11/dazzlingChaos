@@ -4,7 +4,7 @@ using UnityEngine.Splines;
 public class PlayerSlopeReader : MonoBehaviour
 {
     [Header("References")]
-    public MobilePlayerController_Test playerController;
+    public NetworkMobilePlayerController playerController;
 
     [Header("Debug")]
     public float currentSlopeY = 0f;
@@ -18,6 +18,9 @@ public class PlayerSlopeReader : MonoBehaviour
         int railIndex = playerController.CurrentRailIndex;
         float t = playerController.T;
 
+        if (playerController.rails == null || playerController.rails.Count == 0)
+            return;
+
         if (railIndex < 0 || railIndex >= playerController.rails.Count)
             return;
 
@@ -26,6 +29,9 @@ public class PlayerSlopeReader : MonoBehaviour
             return;
 
         var splines = railRef.container.Splines;
+        if (splines == null || splines.Count == 0)
+            return;
+
         if (railRef.splineIndex < 0 || railRef.splineIndex >= splines.Count)
             return;
 
