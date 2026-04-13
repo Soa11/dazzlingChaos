@@ -273,9 +273,10 @@ GameObject:
   - component: {fileID: 5560221494074739157}
   - component: {fileID: 6966194250269295398}
   - component: {fileID: 353459883821420231}
+  - component: {fileID: 6587176910297731903}
   m_Layer: 0
   m_Name: Maze_Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -675,7 +676,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4874197185426328121}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
@@ -791,6 +792,23 @@ MonoBehaviour:
   currentAudioStateName: 
   isLocalAudioPlayer: 0
   initialized: 0
+--- !u!114 &6587176910297731903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4874197185426328121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35ea1637a1c7e6a40b0b2c0238e5252c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerProximityVibrate
+  ShowTopMostFoldoutHeaderGroup: 1
+  sensingRadius: 8
+  checkInterval: 0.2
+  vibrationCooldown: 1.5
+  enableDebugLogs: 0
 --- !u!1 &5562377253855626803
 GameObject:
   m_ObjectHideFlags: 0
