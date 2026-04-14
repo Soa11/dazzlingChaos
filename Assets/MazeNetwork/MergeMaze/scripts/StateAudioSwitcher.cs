@@ -78,19 +78,19 @@ public class StateAudioSwitcher : NetworkBehaviour
 
         if (stateDetector == null)
         {
-            Debug.LogError("[StateAudioSwitcher] stateDetector is missing");
+            //Debug.LogError("[StateAudioSwitcher] stateDetector is missing");
             yield break;
         }
 
         if (audioSource == null)
         {
-            Debug.LogError("[StateAudioSwitcher] audioSource is missing");
+            //Debug.LogError("[StateAudioSwitcher] audioSource is missing");
             yield break;
         }
 
         if (flatClip == null || upClip == null || downClip == null)
         {
-            Debug.LogError("[StateAudioSwitcher] One or more clips are missing");
+            //Debug.LogError("[StateAudioSwitcher] One or more clips are missing");
             yield break;
         }
 
@@ -114,7 +114,7 @@ public class StateAudioSwitcher : NetworkBehaviour
         lastSwitchTime = Time.time;
         initialized = true;
 
-        Debug.Log("[StateAudioSwitcher] Initialized successfully for local owner");
+        //Debug.Log("[StateAudioSwitcher] Initialized successfully for local owner");
     }
 
     void Update()

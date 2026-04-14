@@ -11,7 +11,7 @@ public class PlayerProximityVibrate : NetworkBehaviour
     public float vibrationCooldown = 1.5f;
 
     [Header("Debug")]
-    public bool enableDebugLogs = true;
+    public bool enableEnterExitLogs = true;
 
     private float nextVibrationTime = 0f;
     private bool wasNearSomeone = false;
@@ -26,18 +26,8 @@ public class PlayerProximityVibrate : NetworkBehaviour
         if (!AllPlayers.Contains(this))
             AllPlayers.Add(this);
 
-        if (enableDebugLogs)
-        {
-            Debug.Log($"[Proximity] OnNetworkSpawn | {gameObject.name} | IsOwner={IsOwner} | IsSpawned={IsSpawned}");
-        }
-
         if (IsOwner)
-        {
             proximityCoroutine = StartCoroutine(ProximityCheckLoop());
-
-            if (enableDebugLogs)
-                Debug.Log($"[Proximity] Started on owner: {gameObject.name}");
-        }
     }
 
     public override void OnNetworkDespawn()
@@ -61,18 +51,23 @@ public class PlayerProximityVibrate : NetworkBehaviour
         {
             bool isNearSomeone = IsNearAnyOtherPlayer();
 
-            if (enableDebugLogs)
-                Debug.Log($"[Proximity] {gameObject.name} | Near someone: {isNearSomeone}");
-
-            if (isNearSomeone && !wasNearSomeone && Time.time >= nextVibrationTime)
+            if (isNearSomeone && !wasNearSomeone)
             {
 #if UNITY_ANDROID || UNITY_IOS
-                Handheld.Vibrate();
+                if (Time.time >= nextVibrationTime)
+                {
+                    Handheld.Vibrate();
+                    nextVibrationTime = Time.time + vibrationCooldown;
+                }
 #endif
-                nextVibrationTime = Time.time + vibrationCooldown;
 
-                if (enableDebugLogs)
-                    Debug.Log($"[Proximity] {gameObject.name} | Vibrate triggered");
+                if (enableEnterExitLogs)
+                    Debug.Log($"[Proximity] ENTER | {gameObject.name}");
+            }
+            else if (!isNearSomeone && wasNearSomeone)
+            {
+                if (enableEnterExitLogs)
+                    Debug.Log($"[Proximity] EXIT | {gameObject.name}");
             }
 
             wasNearSomeone = isNearSomeone;
@@ -91,9 +86,6 @@ public class PlayerProximityVibrate : NetworkBehaviour
             if (!other.IsSpawned) continue;
 
             float distance = Vector3.Distance(myPosition, other.transform.position);
-
-            if (enableDebugLogs)
-                Debug.Log($"[Proximity] Checking {gameObject.name} -> {other.gameObject.name} | Distance={distance:F2}");
 
             if (distance <= sensingRadius)
                 return true;

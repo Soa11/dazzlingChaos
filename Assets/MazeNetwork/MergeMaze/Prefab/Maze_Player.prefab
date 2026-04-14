@@ -676,7 +676,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4874197185426328121}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
@@ -684,7 +684,7 @@ AudioSource:
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 1
+  Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -781,12 +781,12 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   stateDetector: {fileID: 5560221494074739157}
   audioSource: {fileID: 6966194250269295398}
-  flatClip: {fileID: 8300000, guid: 4f0eddcd20f657641954c36a342a0b92, type: 3}
-  upClip: {fileID: 8300000, guid: 68694708759a235459c26dde0b483241, type: 3}
+  flatClip: {fileID: 8300000, guid: 30e5af585cccecc4581a5e22f1464489, type: 3}
+  upClip: {fileID: 8300000, guid: 30e5af585cccecc4581a5e22f1464489, type: 3}
   downClip: {fileID: 8300000, guid: 29443fcf78512c948b5dd284961da41a, type: 3}
   minHoldTime: 0.45
-  fadeOutTime: 0.04
-  fadeInTime: 0.08
+  fadeOutTime: 0.1
+  fadeInTime: 0.1
   targetVolume: 0.984
   currentClipName: 
   currentAudioStateName: 
@@ -805,10 +805,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerProximityVibrate
   ShowTopMostFoldoutHeaderGroup: 1
-  sensingRadius: 8
+  sensingRadius: 20
   checkInterval: 0.2
   vibrationCooldown: 1.5
-  enableDebugLogs: 0
+  enableEnterExitLogs: 1
 --- !u!1 &5562377253855626803
 GameObject:
   m_ObjectHideFlags: 0

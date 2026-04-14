@@ -92,7 +92,7 @@ Material:
     - _minBrightness: 0
     m_Colors:
     - _Base_Colour: {r: 0.24705882, g: 0, b: 0.13207549, a: 1}
-    - _Emission_Colour: {r: 0.1627451, g: 0, b: 0.22788121, a: 1}
+    - _Emission_Colour: {r: 0.3254902, g: 0, b: 0.45576242, a: 1}
     - _Height_Tiling: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

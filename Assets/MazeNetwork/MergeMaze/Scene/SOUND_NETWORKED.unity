@@ -48576,7 +48576,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FadeInImage
   canvasGroup: {fileID: 40575775}
-  fadeDuration: 3
+  fadeDuration: 1
 --- !u!225 &40575775
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -242986,7 +242986,7 @@ Transform:
   m_GameObject: {fileID: 722239456}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
-  m_LocalPosition: {x: 0.16357084, y: 30, z: -1.2258236}
+  m_LocalPosition: {x: 0.16357084, y: 35, z: -1.2258236}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -921361,7 +921361,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HostOnlyAudio
   ShowTopMostFoldoutHeaderGroup: 1
-  hostClip: {fileID: 8300000, guid: 08f0f6f775f7f7f4dabee500f5733cef, type: 3}
+  hostClip: {fileID: 8300000, guid: 0a6c615b917a0b449a34d4ab169a0cda, type: 3}
   volume: 0.185
   loop: 1
   playOnNetworkSpawn: 1

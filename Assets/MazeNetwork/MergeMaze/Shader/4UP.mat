@@ -74,7 +74,7 @@ Material:
     - _DepthMin: 0
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _Emission_Intensity: 0.1
+    - _Emission_Intensity: 0.2
     - _MinAlpha: 0.1
     - _Normal_Strength: 0.5
     - _QueueControl: 0

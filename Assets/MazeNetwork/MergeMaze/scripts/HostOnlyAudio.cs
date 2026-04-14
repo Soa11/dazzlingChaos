@@ -52,7 +52,7 @@ public class HostOnlyAudio : NetworkBehaviour
         }
         else
         {
-            Debug.LogWarning("[HostOnlyAudio] No hostClip assigned.");
+            //Debug.LogWarning("[HostOnlyAudio] No hostClip assigned.");
         }
     }
 

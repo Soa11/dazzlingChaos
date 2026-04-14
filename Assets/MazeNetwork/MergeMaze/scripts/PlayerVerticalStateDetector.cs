@@ -118,7 +118,7 @@ public class PlayerVerticalStateDetector : MonoBehaviour
 
         if (currentVerticalState != previousVerticalState)
         {
-            Debug.Log($"Vertical State Changed -> {currentVerticalState} | slopeY = {currentSlopeY:F4}");
+            //Debug.Log($"Vertical State Changed -> {currentVerticalState} | slopeY = {currentSlopeY:F4}");
             previousVerticalState = currentVerticalState;
         }
     }
