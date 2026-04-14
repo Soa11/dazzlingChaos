@@ -274,6 +274,7 @@ GameObject:
   - component: {fileID: 6966194250269295398}
   - component: {fileID: 353459883821420231}
   - component: {fileID: 6587176910297731903}
+  - component: {fileID: 8961929186198337303}
   m_Layer: 0
   m_Name: Maze_Player
   m_TagString: Player
@@ -523,7 +524,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HideMenuOnSpawn
   ShowTopMostFoldoutHeaderGroup: 1
-  hideDelay: 5
+  hideDelay: 20
   menuDocument: {fileID: 0}
 --- !u!54 &7247941046268532447
 Rigidbody:
@@ -625,7 +626,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4874197185426328121}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1e221f62a2b315e45a94818bf09b3f52, type: 3}
   m_Name: 
@@ -809,6 +810,21 @@ MonoBehaviour:
   checkInterval: 0.2
   vibrationCooldown: 1.5
   enableEnterExitLogs: 1
+--- !u!114 &8961929186198337303
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4874197185426328121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d19268552413324fb79fc4224cbc769, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NetworkPlayerSpawnSlots
+  ShowTopMostFoldoutHeaderGroup: 1
+  spawnRootName: SpawnPoint
+  prioritizePrimarySlots: 1
 --- !u!1 &5562377253855626803
 GameObject:
   m_ObjectHideFlags: 0
