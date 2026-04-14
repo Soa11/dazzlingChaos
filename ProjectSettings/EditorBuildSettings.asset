@@ -20,7 +20,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/NetworkBuild/MultiplayerSession/Scenes/UI.unity
     guid: 755e3d8ea3373e549b58bc4490d165bc
-  - enabled: 1
+  - enabled: 0
     path: Assets/MazeNetwork/MergeMaze/Scene/Merge.unity
     guid: 3eaf32b3bb9cb0245808f26d8a2d4aa8
   - enabled: 1
