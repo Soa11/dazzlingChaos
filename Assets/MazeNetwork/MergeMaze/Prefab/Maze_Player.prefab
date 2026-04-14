@@ -524,7 +524,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HideMenuOnSpawn
   ShowTopMostFoldoutHeaderGroup: 1
-  hideDelay: 20
+  hideDelay: 10
   menuDocument: {fileID: 0}
 --- !u!54 &7247941046268532447
 Rigidbody:
@@ -583,7 +583,7 @@ MonoBehaviour:
     splineIndex: 0
   - container: {fileID: 0}
     splineIndex: 0
-  maxSpeed: 16
+  maxSpeed: 18
   accel: 10
   inputDeadzone: 0.08
   posSpring: 50
@@ -662,10 +662,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerVerticalStateDetector
   slopeReader: {fileID: 1597127707711638305}
-  enterUpThreshold: 0.6
-  enterDownThreshold: -0.4
-  upToDownThreshold: -0.4
-  downToUpThreshold: 0.6
+  enterUpThreshold: 0.5
+  enterDownThreshold: -0.5
+  upToDownThreshold: -0.5
+  downToUpThreshold: 0.5
   flatZoneThreshold: 0.06
   flatHoldTime: 0.28
   currentVerticalState: 0
@@ -683,7 +683,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.618
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -785,10 +785,10 @@ MonoBehaviour:
   flatClip: {fileID: 8300000, guid: 30e5af585cccecc4581a5e22f1464489, type: 3}
   upClip: {fileID: 8300000, guid: 30e5af585cccecc4581a5e22f1464489, type: 3}
   downClip: {fileID: 8300000, guid: 29443fcf78512c948b5dd284961da41a, type: 3}
-  minHoldTime: 0.45
+  minHoldTime: 0.9
   fadeOutTime: 0.1
   fadeInTime: 0.1
-  targetVolume: 0.984
+  targetVolume: 0.504
   currentClipName: 
   currentAudioStateName: 
   isLocalAudioPlayer: 0
@@ -806,7 +806,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerProximityVibrate
   ShowTopMostFoldoutHeaderGroup: 1
-  sensingRadius: 20
+  sensingRadius: 10
   checkInterval: 0.2
   vibrationCooldown: 1.5
   enableEnterExitLogs: 1
