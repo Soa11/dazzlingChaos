@@ -6,6 +6,10 @@ public class SpectatorFollow : MonoBehaviour
     [Header("Switching")]
     public float switchInterval = 10f;
 
+    [Header("Spectator Camera Offset")]
+    public Vector3 spectatorOffset = new Vector3(-0.1f, 0.15f, -3.5f);
+    public Vector3 spectatorEulerOffset = Vector3.zero;
+
     private PlayerCameraMarker[] cams;
     private Transform targetCam;
     private int currentIndex = -1;
@@ -79,10 +83,7 @@ public class SpectatorFollow : MonoBehaviour
             return;
         }
 
-        Vector3 offset = targetCam.localPosition;
-        Quaternion rotOffset = targetCam.localRotation;
-
-        transform.position = playerRoot.TransformPoint(offset);
-        transform.rotation = playerRoot.rotation * rotOffset;
+        transform.position = playerRoot.TransformPoint(spectatorOffset);
+        transform.rotation = playerRoot.rotation * Quaternion.Euler(spectatorEulerOffset);
     }
 }
