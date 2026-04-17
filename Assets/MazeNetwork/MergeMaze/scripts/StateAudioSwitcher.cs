@@ -152,17 +152,17 @@ public class StateAudioSwitcher : NetworkBehaviour
         {
             case AudioState.Up:
                 targetClip = upClip;
-                Debug.Log("[StateAudioSwitcher] Switching to UP");
+                //Debug.Log("[StateAudioSwitcher] Switching to UP");
                 break;
 
             case AudioState.Down:
                 targetClip = downClip;
-                Debug.Log("[StateAudioSwitcher] Switching to DOWN");
+                //Debug.Log("[StateAudioSwitcher] Switching to DOWN");
                 break;
 
             default:
                 targetClip = flatClip;
-                Debug.Log("[StateAudioSwitcher] Switching to FLAT");
+                //Debug.Log("[StateAudioSwitcher] Switching to FLAT");
                 break;
         }
 
@@ -184,7 +184,7 @@ public class StateAudioSwitcher : NetworkBehaviour
         audioSource.Play();
 
         currentClipName = clip.name;
-        Debug.Log("[StateAudioSwitcher] Playing initial clip: " + clip.name);
+        //Debug.Log("[StateAudioSwitcher] Playing initial clip: " + clip.name);
     }
 
     IEnumerator SwitchWithFade(AudioClip newClip)
@@ -215,7 +215,7 @@ public class StateAudioSwitcher : NetworkBehaviour
         audioSource.Play();
 
         currentClipName = newClip.name;
-        Debug.Log("[StateAudioSwitcher] New clip started: " + newClip.name);
+        //Debug.Log("[StateAudioSwitcher] New clip started: " + newClip.name);
 
         t = 0f;
         while (t < fadeInTime)

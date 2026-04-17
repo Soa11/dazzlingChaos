@@ -11,9 +11,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/MazeNetwork/MergeMaze/Scene/SOUND_NETWORKED.unity
     guid: 25154ee782249d14a97e9d004b48691e
-  - enabled: 1
+  - enabled: 0
     path: Assets/MazeNetwork/MergeMaze/Scene/SomersetTest.unity
     guid: 3af08351247510d4bbe8d5ce0d639b08
+  - enabled: 1
+    path: Assets/MazeNetwork/MergeMaze/Scene/CAMERA.unity
+    guid: 774245b6ba983d940b0d0ec6aff59534
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
