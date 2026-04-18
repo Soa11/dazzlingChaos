@@ -81,6 +81,24 @@ public class NetworkMobilePlayerController : NetworkBehaviour
     public float T { get; private set; } = 0f;
     public bool IsLocked { get; private set; } = true;
 
+
+    public string CurrentRailName
+    {
+        get
+        {
+            if (CurrentRailIndex < 0 || CurrentRailIndex >= rails.Count)
+                return "None";
+
+            var r = rails[CurrentRailIndex];
+            return r.container != null ? r.container.name : "None";
+        }
+    }
+
+
+
+
+
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -314,6 +332,11 @@ public class NetworkMobilePlayerController : NetworkBehaviour
         tangent = rr.container.transform.TransformDirection(
             (Vector3)SplineUtility.EvaluateTangent(sp, T)
         ).normalized;
+
+        if (float.IsNaN(tangent.x) || float.IsNaN(tangent.y) || float.IsNaN(tangent.z))
+        {
+            Debug.LogError($"[RailDebug] Bad tangent on rail {CurrentRailName} at T={T}");
+        }
 
         Vector3 toTarget = railPos - rb.position;
         Vector3 springAccel = posSpring * toTarget - posDamping * rb.linearVelocity;
