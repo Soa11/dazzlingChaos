@@ -69,6 +69,12 @@ public class MapManager : MonoBehaviour
             follower.target = playerTransform;
         }
 
+        MapNameSync nameSync = marker.GetComponent<MapNameSync>();
+        if (nameSync != null)
+        {
+            nameSync.target = playerTransform;
+        }
+
         markerByPlayer[playerTransform] = marker;
     }
 }

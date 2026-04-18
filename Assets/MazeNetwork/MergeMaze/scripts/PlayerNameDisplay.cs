@@ -11,6 +11,8 @@ public class PlayerNameDisplay : NetworkBehaviour
     private readonly NetworkVariable<FixedString64Bytes> networkPlayerName =
         new NetworkVariable<FixedString64Bytes>("Player");
 
+    public string CurrentPlayerName => networkPlayerName.Value.ToString();
+
     public override void OnNetworkSpawn()
     {
         networkPlayerName.OnValueChanged += OnPlayerNameChanged;
