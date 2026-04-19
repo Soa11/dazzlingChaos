@@ -14,12 +14,15 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/MazeNetwork/MergeMaze/Scene/SomersetTest.unity
     guid: 3af08351247510d4bbe8d5ce0d639b08
-  - enabled: 1
+  - enabled: 0
     path: Assets/MazeNetwork/MergeMaze/Scene/CAMERA.unity
     guid: 774245b6ba983d940b0d0ec6aff59534
-  - enabled: 1
+  - enabled: 0
     path: Assets/MazeNetwork/MergeMaze/Scene/2DMAP.unity
     guid: d5c04fb6e193d804296aeec1633861d5
+  - enabled: 1
+    path: Assets/MazeNetwork/MergeMaze/Scene/MobileEnding.unity
+    guid: f09155b0230439e46917643dfd6977b3
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
